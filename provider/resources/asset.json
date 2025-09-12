@@ -1,8 +1,13 @@
 {
   "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
   "@type": "AssetEntryDto",
-  "asset": { "properties": { "name": "test-document", "description": "Azurite blob", "contenttype": "text/plain" } },
+  "properties": {
+    "name": "test-document",
+    "description": "Azurite blob",
+    "contenttype": "text/plain"
+  },
   "dataAddress": {
+    "@type": "DataAddress",
     "type": "AzureStorage",
     "account": "provider",
     "container": "src-container",
