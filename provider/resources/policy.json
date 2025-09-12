@@ -3,10 +3,10 @@
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
     "odrl": "http://www.w3.org/ns/odrl/2/"
   },
-  "@id": "aPolicyDefinition",
+  "@id": "aPolicy",
   "policy": {
-    "@id": "aPolicy",
-    "@type": "odrl:Set",
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@type": "Set",
     "permission": [],
     "prohibition": [],
     "obligation": []

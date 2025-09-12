@@ -1,6 +1,8 @@
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
-  "@type": "AssetEntryDto",
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "AssetId",
   "properties": {
     "name": "test-document",
     "description": "Azurite blob",
