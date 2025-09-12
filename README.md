@@ -59,3 +59,13 @@ curl -s -X POST "http://100.93.225.17:19193/management/v3/policydefinitions" \
 curl -s -X POST "http://100.93.225.17:19193/management/v3/contractdefinitions" \
 -H "X-Api-Key: password" -H "Content-Type: application/json" \
 -d @provider/resources/contract-definition.json | jq
+
+# Receive contracts
+curl -X POST "http://100.78.21.5:29193/management/v3/catalog/request" \
+-H 'X-Api-Key: password' -H 'Content-Type: application/json' \
+-d @consumer/resources/fetch-catalog.json -s | jq
+
+# Negotiate contract
+curl -d @consumer/resources/negotiate-contract.json \
+-H 'X-Api-Key: password' X POST -H 'content-type: application/json' http://localhost:29193/management/v3/contractnegotiations \
+-s | jq
