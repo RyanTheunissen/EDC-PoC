@@ -18,7 +18,7 @@ dependencies {
     implementation("org.eclipse.edc:runtime-core:$edc")
     implementation("org.eclipse.edc:connector-core:$edc")
 
-    // Control plane & APIs (consumer initiates catalog/negotiation/transfer)
+    // Control plane & APIs
     implementation("org.eclipse.edc:control-plane-core:$edc")
     implementation("org.eclipse.edc:control-plane-api:$edc")
     implementation("org.eclipse.edc:management-api:$edc")
@@ -26,7 +26,13 @@ dependencies {
     implementation("org.eclipse.edc:http:$edc")
     implementation("org.eclipse.edc:configuration-filesystem:$edc")
 
-    // Data plane (consumer DP is useful for PULL or EDR flows; harmless to include)
+    // 🔻 Add these missing ones
+    implementation("org.eclipse.edc:control-plane-api-client:$edc")     // fixes TransferProcessApiClient usage
+    implementation("org.eclipse.edc:control-api-configuration:$edc")    // fixes ControlApiUrl
+    implementation("org.eclipse.edc:iam-mock:$edc")                     // fixes IdentityService/AudienceResolver
+    implementation("org.eclipse.edc:edr-store-core:$edc")               // fixes EDR store
+
+    // Data plane + signaling + selector
     implementation("org.eclipse.edc:data-plane-core:$edc")
     implementation("org.eclipse.edc:data-plane-http:$edc")
     implementation("org.eclipse.edc:data-plane-self-registration:$edc")
@@ -36,7 +42,10 @@ dependencies {
     implementation("org.eclipse.edc:transfer-data-plane-signaling:$edc")
     implementation("org.eclipse.edc:data-plane-public-api-v2:$edc")
 
-    // Storage + Vault (needed if you test PULL; otherwise harmless)
+    // 🔻 Add client impl for transfer DP signaling
+    implementation("org.eclipse.edc:data-plane-signaling-client:$edc")
+
+    // Storage + Vault (ok to keep even if you use PUSH)
     implementation("org.eclipse.edc.aws:data-plane-aws-s3:$edc")
     implementation("org.eclipse.edc.azure:data-plane-azure-storage:$edc")
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
