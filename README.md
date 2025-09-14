@@ -77,3 +77,13 @@ curl -X POST "http://100.78.21.5:29193/management/v3/transferprocesses" \
 -H 'X-Api-Key: password' -H "Content-Type: application/json" \
 -d @consumer/resources/start-transfer.json \
 -s | jq
+
+# Clear all docker containers
+
+**provider**
+
+docker compose -f provider/resources/docker-compose-provider.yaml down
+
+**consumer**
+
+docker compose -f consumer/resources/docker-compose-consumer.yaml down
