@@ -41,8 +41,39 @@ java -Dedc.fs.config=provider/config.properties -jar provider/build/libs/provide
 
 **Boot consumer connector:**
 
-java -Dedc.fs.config=transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/config.properties -jar transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/build/libs/consumer.jar
+java -Dedc.fs.config=consumer/config.properties -jar consumer/build/libs/consumer-all.jar
 
 **Provider catalog bootstrapping:**
 
 The provider now auto-creates the Asset(id=1), PolicyDefinition(id=1 with USE), and ContractDefinition(id=1 selecting asset 1) at startup via a ServiceExtension. No manual POSTs are required.
+
+# Consumer steps
+
+**Setting up the Minio bucket**
+
+Use username:consumer and password:password to login to the Minio blobstorage from localhost:9001.
+
+Create a bucket named 'src-bucket' for the sake of this example.
+
+**Consumer calls**
+
+Fetch catalog
+curl -X POST "http://100.78.21.5:29193/management/v3/catalog/request" \
+-H 'X-Api-Key: password' -H 'Content-Type: application/json' \
+-d @consumer/resources/fetch-catalog.json -s | jq
+
+Negotiate contract
+curl -d @consumer/resources/negotiate-contract.json \
+-H 'X-Api-Key: password' X POST -H 'content-type: application/json' http://100.78.21.5:29193/management/v3/contractnegotiations \
+-s | jq
+
+get contract id
+curl -X GET "http://100.78.21.5:29193/management/v3/contractnegotiations/6a80a549-38e2-43f6-8d78-ac9e9c7bd66b" \
+-H 'X-Api-Key: password' --header 'Content-Type: application/json' \
+-s | jq
+
+start transfer
+curl -X POST "http://100.78.21.5:29193/management/v3/transferprocesses" \
+-H 'X-Api-Key: password' -H "Content-Type: application/json" \
+-d @consumer/resources/start-transfer.json \
+-s | jq

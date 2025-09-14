@@ -5,7 +5,7 @@
   "@type": "TransferRequestDto",
   "connectorId": "provider",
   "counterPartyAddress": "http://100.93.225.17:19194/protocol",
-  "contractId": "7c87484c-acdd-4c12-b69e-c865a69bd691",
+  "contractId": "070db663-5b97-4f10-86f9-35b3da8582b5",
   "protocol": "dataspace-protocol-http",
   "transferType": "AmazonS3-PUSH",
   "dataDestination": {
