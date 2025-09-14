@@ -43,29 +43,6 @@ java -Dedc.fs.config=provider/config.properties -jar provider/build/libs/provide
 
 java -Dedc.fs.config=transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/config.properties -jar transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/build/libs/consumer.jar
 
-**Set provider rules:**
+**Provider catalog bootstrapping:**
 
-# Asset
-curl -s -X POST "http://100.93.225.17:19193/management/v3/assets" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/asset.json | jq
-
-# Policy
-curl -s -X POST "http://100.93.225.17:19193/management/v3/policydefinitions" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/policy.json | jq
-
-# Contract definition
-curl -s -X POST "http://100.93.225.17:19193/management/v3/contractdefinitions" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/contract-definition.json | jq
-
-# Receive contracts
-curl -X POST "http://100.78.21.5:29193/management/v3/catalog/request" \
--H 'X-Api-Key: password' -H 'Content-Type: application/json' \
--d @consumer/resources/fetch-catalog.json -s | jq
-
-# Negotiate contract
-curl -d @consumer/resources/negotiate-contract.json \
--H 'X-Api-Key: password' X POST -H 'content-type: application/json' http://localhost:29193/management/v3/contractnegotiations \
--s | jq
+The provider now auto-creates the Asset(id=1), PolicyDefinition(id=1 with USE), and ContractDefinition(id=1 selecting asset 1) at startup via a ServiceExtension. No manual POSTs are required.
