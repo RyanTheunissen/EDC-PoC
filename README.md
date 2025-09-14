@@ -43,19 +43,6 @@ java -Dedc.fs.config=provider/config.properties -jar provider/build/libs/provide
 
 java -Dedc.fs.config=transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/config.properties -jar transfer/transfer-05-file-transfer-cloud/cloud-transfer-consumer/build/libs/consumer.jar
 
-**Set provider rules:**
+**Provider catalog bootstrapping:**
 
-# Asset
-curl -s -X POST "http://100.93.225.17:19193/management/v3/assets" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/asset.json | jq
-
-# Policy
-curl -s -X POST "http://100.93.225.17:19193/management/v3/policydefinitions" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/policy.json | jq
-
-# Contract definition
-curl -s -X POST "http://100.93.225.17:19193/management/v3/contractdefinitions" \
--H "X-Api-Key: password" -H "Content-Type: application/json" \
--d @provider/resources/contract-definition.json | jq
+The provider now auto-creates the Asset(id=1), PolicyDefinition(id=1 with USE), and ContractDefinition(id=1 selecting asset 1) at startup via a ServiceExtension. No manual POSTs are required.
