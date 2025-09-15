@@ -1,12 +1,23 @@
 # EDC Proof of Concept (EDC-PoC)
 
-This project demonstrates a simple setup of **Provider** and **Consumer** connectors using Docker, Azure Blob Storage, Vault, and Minio.
+This project demonstrates a simple setup of **Provider** and **Consumer** connectors.
 
 ---
 
 ## Build Project
 
-Generate the Gradle wrapper and build shadow JARs:
+Generate the Gradle wrapper.
+
+./gradlew wrapper
+
+
+Build JARs:
+
+./gradlew build
+
+
+Or build only shadow JARs:
+
 
 ./gradlew :consumer:shadowJar  
 ./gradlew :provider:shadowJar
