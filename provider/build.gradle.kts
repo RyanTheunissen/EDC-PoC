@@ -45,6 +45,9 @@ dependencies {
     implementation("org.eclipse.edc.aws:data-plane-aws-s3:$edc")
     implementation("org.eclipse.edc.azure:data-plane-azure-storage:$edc")
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
+
+    // JDBC driver for the PoC SQL endpoint
+    implementation("org.postgresql:postgresql:42.7.4")
 }
 
 tasks.shadowJar {

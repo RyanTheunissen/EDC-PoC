@@ -1,1 +1,2 @@
 org.eclipse.edc.poc.CloudBootstrapExtension
+org.eclipse.edc.poc.SqlQueryExtension
