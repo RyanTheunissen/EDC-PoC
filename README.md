@@ -77,8 +77,6 @@ The provider automatically creates the following at startup:
 - **PolicyDefinition**: `id=1` with `USE`
 - **ContractDefinition**: `id=1` selecting asset `1`
 
-No manual POST requests are required.
-
 ---
 
 # Consumer Steps
