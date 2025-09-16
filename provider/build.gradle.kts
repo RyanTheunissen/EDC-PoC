@@ -8,7 +8,7 @@ application {
 }
 
 java {
-    toolchain { languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(17)) }
+    toolchain { languageVersion.set(JavaLanguageVersion.of(17)) }
 }
 
 dependencies {
