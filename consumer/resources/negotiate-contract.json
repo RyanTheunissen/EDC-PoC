@@ -1,16 +1,15 @@
 {
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "ContractRequest",
   "counterPartyAddress": "http://100.93.225.17:19194/protocol",
   "protocol": "dataspace-protocol-http",
-  "offer": {
-    "offerId": "<OFFER_ID_FROM_CATALOG>",
-    "assetId": "asset-users",
-    "policy": {
-      "@type": "Policy",
-      "@context": {
-        "odrl": "http://www.w3.org/ns/odrl/2/",
-        "edc": "https://w3id.org/edc/v0.0.1/ns/"
-      },
-      "odrl:permission": [ { "odrl:action": { "odrl:type": "USE" } } ]
-    }
+  "policy": {
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@id": "MQ==:YXNzZXQtdXNlcnM=:OGNkOWNmMWMtMjg4Ni00MmExLWEzZTItMzg0OGVhNTU0YWMy",
+    "@type": "Offer",
+    "assigner": "provider",
+    "target": "assetId"
   }
 }
