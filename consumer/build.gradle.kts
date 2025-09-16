@@ -53,6 +53,14 @@ dependencies {
 
     // JDBC driver for PostgreSQL
     implementation("org.postgresql:postgresql:42.7.4")
+
+    // JDBC Data-Plane extension (choose one available in your distro)
+    // NOTE: Uncomment ONE of the following once you add the JDBC DP module to your repository or Maven repo.
+    implementation("org.eclipse.edc:data-plane-jdbc:$edc")
+    // implementation("org.eclipse.edc:extensions:dataplane:data-plane-jdbc:$edc")
+    // implementation("org.eclipse.edc:community:data-plane-sql:$edc")
+    // Optional: validator for JdbcData addresses if provided by your module
+    // implementation("org.eclipse.edc:validator-data-address-jdbc-data:$edc")
 }
 
 tasks.shadowJar {
