@@ -34,21 +34,6 @@ docker compose -f consumer/resources/docker-compose-consumer.yaml up -d
 
 ---
 
-## Upload File to Azure Blob Storage
-
-1. Set the connection string:  
-   conn_str="DefaultEndpointsProtocol=http;AccountName=provider;AccountKey=password;BlobEndpoint=http://100.93.225.17:10000/provider;"
-
-2. Create a container:  
-   az storage container create --name src-container --connection-string $conn_str
-
-3. Upload a test file:  
-   az storage blob upload -f ./provider/resources/test-document.txt --container-name src-container --name test-document.txt --connection-string $conn_str
-
-4. Verify the upload:  
-   az storage blob list --container-name src-container --connection-string "$conn_str" --query "[].{name:name}" --output table
-
----
 
 ## Configure Vault
 
