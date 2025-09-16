@@ -1,39 +1,42 @@
-package org.example.edc.dataplane.postgres.pipeline;
+package org.example.edc.dataplane.postgres;
 
 
-import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSink;
-import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSinkFactory;
-import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.DataTransferExecutorServiceContainer;
+import org.eclipse.edc.connector.dataplane.spi.pipeline.PipelineService;
+import org.eclipse.edc.runtime.metamodel.annotation.Extension;
+import org.eclipse.edc.runtime.metamodel.annotation.Inject;
+import org.eclipse.edc.spi.security.Vault;
+import org.eclipse.edc.spi.system.ServiceExtension;
+import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.example.edc.dataplane.postgres.pipeline.PgClient;
+import org.example.edc.dataplane.postgres.pipeline.PostgresDataSinkFactory;
+import org.example.edc.dataplane.postgres.pipeline.PostgresDataSourceFactory;
 
 
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
+@Extension(value = DataPlanePostgresExtension.NAME)
+public class DataPlanePostgresExtension implements ServiceExtension {
+    public static final String NAME = "Data Plane — Postgres JDBC";
 
 
-import static org.example.edc.dataplane.postgres.pipeline.PostgresDataSchema.TYPE;
-
-
-public class PostgresDataSinkFactory implements DataSinkFactory {
-    private final PgClient client;
-    private final Monitor monitor;
-    private final ExecutorService executor;
-
-
-    public PostgresDataSinkFactory(PgClient client, Monitor monitor, ExecutorService executor) {
-        this.client = client;
-        this.monitor = monitor;
-        this.executor = executor;
-    }
+    @Inject private PipelineService pipelineService;
+    @Inject private DataTransferExecutorServiceContainer executors;
+    @Inject private Vault vault;
 
 
     @Override
-    public boolean canHandle(Map<String, Object> destination) {
-        return TYPE.equals(destination.get("type"));
-    }
+    public String name() { return NAME; }
 
 
     @Override
-    public DataSink createSink(Map<String, Object> destination) {
-        return new PostgresDataSink(client, monitor, executor, destination);
+    public void initialize(ServiceExtensionContext context) {
+        var monitor = context.getMonitor();
+        var client = new PgClient(monitor, vault);
+
+
+        pipelineService.registerFactory(new PostgresDataSourceFactory(client, monitor, executors.getExecutorService()));
+        pipelineService.registerFactory(new PostgresDataSinkFactory(client, monitor, executors.getExecutorService()));
+
+
+        monitor.info("[pg-dataplane] Registered JDBC Postgres source+sink (type=JdbcData)");
     }
 }
