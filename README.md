@@ -98,6 +98,17 @@ Prerequisites:
 - The Consumer DB has connectivity and credentials to write to a table `users_incoming` (it will be created by your sink depending on the JDBC data plane module; otherwise pre-create it).
 - Your runtimes include a JDBC/SQL-capable data plane extension. If not, use the HTTP fallback in EDC samples.
 
+Enable JDBC data-plane in both runtimes:
+- Open consumer/build.gradle.kts and provider/build.gradle.kts
+- In dependencies, uncomment ONE of the JDBC DP dependency lines under "JDBC Data-Plane extension" that matches your distribution. If you own a private JDBC DP module, add its coordinates there.
+- Rebuild both shadow JARs.
+
+Named datasource configuration is already present in both config.properties:
+- Provider: edc.datasource.pg-ds.*
+- Consumer: edc.datasource.consumer-pg-ds.*
+
+If your JDBC DP expects inline connection properties instead, the included JSONs already provide inline keys (jdbc:url, jdbc:user, ...), and you can leave the named datasource props unused.
+
 1) Create Provider catalog entries (Asset, Policy, ContractDefinition)
 
 curl -X POST "http://100.93.225.17:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/asset-users.json -s | jq
