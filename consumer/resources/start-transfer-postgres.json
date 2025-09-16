@@ -1,0 +1,16 @@
+{
+  "assetId": "asset-users",
+  "contractId": "<CONTRACT_AGREEMENT_ID>",
+  "protocol": "dataspace-protocol-http",
+  "counterPartyAddress": "http://100.93.225.17:19194/protocol",
+  "dataDestination": {
+    "type": "JdbcData",
+    "edc:jdbc:url": "jdbc:postgresql://127.0.0.1:5432/pocdb",
+    "edc:jdbc:user": "pocuser",
+    "edc:jdbc:password": "pocpass",
+    "edc:jdbc:driverClassName": "org.postgresql.Driver",
+    "edc:sql:table": "users_incoming"
+  },
+  "transferType": { "contentType": "application/json" },
+  "managedResources": false
+}

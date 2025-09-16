@@ -1,0 +1,19 @@
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@id": "asset-users",
+  "properties": {
+    "name": "Users table",
+    "description": "Postgres users table exposed via JDBC",
+    "contenttype": "application/json"
+  },
+  "dataAddress": {
+    "type": "JdbcData",
+    "jdbc:url": "jdbc:postgresql://127.0.0.1:5432/pocdb",
+    "jdbc:user": "pocuser",
+    "jdbc:password": "pocpass",
+    "jdbc:driverClassName": "org.postgresql.Driver",
+    "sql:query": "SELECT * FROM users"
+  }
+}

@@ -91,6 +91,43 @@ curl -X POST "http://100.78.21.5:29193/management/v3/transferprocesses" -H "X-Ap
 
 ---
 
+## Postgres → Postgres transfer (via EDC negotiation)
+
+Prerequisites:
+- The Provider DB has a table named `users`.
+- The Consumer DB has connectivity and credentials to write to a table `users_incoming` (it will be created by your sink depending on the JDBC data plane module; otherwise pre-create it).
+- Your runtimes include a JDBC/SQL-capable data plane extension. If not, use the HTTP fallback in EDC samples.
+
+1) Create Provider catalog entries (Asset, Policy, ContractDefinition)
+
+curl -X POST "http://100.93.225.17:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/asset-users.json -s | jq
+
+curl -X POST "http://100.93.225.17:19193/management/v3/policydefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/policy-allow-all.json -s | jq
+
+curl -X POST "http://100.93.225.17:19193/management/v3/contractdefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/contractdefinition-users.json -s | jq
+
+2) From Consumer, fetch Catalog and locate the offer for asset `asset-users`
+
+curl -X POST "http://100.78.21.5:29193/management/v3/catalog/request" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/fetch-catalog.json -s | jq
+
+3) Start Contract Negotiation (replace <OFFER_ID_FROM_CATALOG> first)
+
+curl -X POST "http://100.78.21.5:29193/management/v3/contractnegotiations" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/negotiate-contract.json -s | jq
+
+4) Poll negotiation until FINALIZED and copy `contractAgreementId`
+
+curl -X GET "http://100.78.21.5:29193/management/v3/contractnegotiations/<NEGOTIATION_ID>" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+
+5) Start Transfer (replace <CONTRACT_AGREEMENT_ID>)
+
+curl -X POST "http://100.78.21.5:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer-postgres.json -s | jq
+
+Notes:
+- The JSONs use a "JdbcData" dataAddress with common keys (edc:jdbc:url, edc:sql:query/table). Adjust to the exact keys expected by your JDBC data-plane extension.
+- If you don’t have a JDBC data-plane, use the HTTP-based sample from EDC and ingest into Postgres with your own job.
+
+---
+
 ## Clean Up
 
 ### Stop Provider Containers
@@ -98,5 +135,4 @@ docker compose -f provider/resources/docker-compose-provider.yaml down
 
 ### Stop Consumer Containers
 docker compose -f consumer/resources/docker-compose-consumer.yaml down
-
 ---
