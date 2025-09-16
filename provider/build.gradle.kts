@@ -45,6 +45,7 @@ dependencies {
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
 
     // JDBC driver for PostgreSQL
+    implementation(project(":pg-dataplane"))
     implementation("org.postgresql:postgresql:42.7.4")
 }
 

@@ -14,7 +14,7 @@ import org.example.edc.dataplane.postgres.pipeline.PostgresDataSourceFactory;
 
 
 @Extension(value = DataPlanePostgresExtension.NAME)
-public class DataPlanePostgresExtension implements ServiceExtension {
+public class DataPlanePostgresExtension implements org.eclipse.edc.spi.system.ServiceExtension {
     public static final String NAME = "Data Plane — Postgres JDBC";
 
 
