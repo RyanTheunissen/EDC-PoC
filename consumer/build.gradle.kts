@@ -8,7 +8,7 @@ application {
 }
 
 java {
-    toolchain { languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(17)) }
+    toolchain { languageVersion.set(JavaLanguageVersion.of(17)) }
 }
 
 dependencies {
@@ -26,7 +26,7 @@ dependencies {
     implementation("org.eclipse.edc:http:$edc")
     implementation("org.eclipse.edc:configuration-filesystem:$edc")
 
-    // 🔻 Add these missing ones
+    // Add these missing ones
     implementation("org.eclipse.edc:control-plane-api-client:$edc")     // fixes TransferProcessApiClient usage
     implementation("org.eclipse.edc:control-api-configuration:$edc")    // fixes ControlApiUrl
     implementation("org.eclipse.edc:iam-mock:$edc")                     // fixes IdentityService/AudienceResolver
@@ -42,15 +42,17 @@ dependencies {
     implementation("org.eclipse.edc:transfer-data-plane-signaling:$edc")
     implementation("org.eclipse.edc:data-plane-public-api-v2:$edc")
 
-    // 🔻 Add client impl for transfer DP signaling
+    // Add client impl for transfer DP signaling
     implementation("org.eclipse.edc:data-plane-signaling-client:$edc")
 
-    // Storage + Vault (ok to keep even if you use PUSH)
-    implementation("org.eclipse.edc.aws:data-plane-aws-s3:$edc")
-    implementation("org.eclipse.edc.azure:data-plane-azure-storage:$edc")
+    // Vault (ok to keep even if you use PUSH)
+
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
 
     implementation("org.eclipse.edc:validator-data-address-http-data:$edc")
+
+    // JDBC driver for PostgreSQL
+    implementation("org.postgresql:postgresql:42.7.4")
 }
 
 tasks.shadowJar {
