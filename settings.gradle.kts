@@ -7,4 +7,5 @@ dependencyResolutionManagement {
     repositories { mavenCentral(); mavenLocal() }
 }
 
-include("provider", "consumer", "pg-dataplane")
+include("provider", "consumer")
+include(":extensions:data-plane:data-plane-postgres")

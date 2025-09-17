@@ -52,7 +52,7 @@ dependencies {
     implementation("org.eclipse.edc:validator-data-address-http-data:$edc")
 
     // JDBC driver for PostgreSQL
-    implementation(project(":pg-dataplane"))
+    implementation(project(":extensions:data-plane:data-plane-postgres"))
     implementation("org.postgresql:postgresql:42.7.4")
 }
 
