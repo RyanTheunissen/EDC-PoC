@@ -5,6 +5,8 @@ import org.eclipse.edc.spi.types.domain.DataAddress;
 import java.util.Map;
 
 final class PgCfg {
+    private static final String EDC_NS = "https://w3id.org/edc/v0.0.1/ns/";
+
     private final String jdbcUrl;
     private final String user;
     private final String password;
@@ -22,27 +24,37 @@ final class PgCfg {
     }
 
     static PgCfg fromAddress(DataAddress a) {
-        Map<String, Object> props = a.getProperties();
+        Map<String, Object> p = a.getProperties();
         return new PgCfg(
-                require(props, "jdbcUrl"),
-                require(props, "user"),
-                require(props, "password"),
-                asString(props.get("sql")),
-                asString(props.get("table")),
-                Boolean.parseBoolean(asString(props.getOrDefault("truncateBeforeLoad", "false")))
+                require(p, "jdbcUrl"),
+                require(p, "user"),
+                require(p, "password"),
+                get(p, "sql"),
+                get(p, "table"),
+                Boolean.parseBoolean(orDefault(p, "truncateBeforeLoad", "false"))
         );
     }
 
-    private static String require(Map<String, Object> props, String key) {
-        var v = props.get(key);
-        if (v == null || asString(v).trim().isEmpty()) {
-            throw new IllegalArgumentException("Missing DataAddress property: " + key);
+    /* === helpers that understand JSON-LD-expanded keys === */
+
+    private static String require(Map<String, Object> p, String local) {
+        var v = get(p, local);
+        if (v == null || v.trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing DataAddress property: " + local + " (or " + EDC_NS + local + ")");
         }
-        return asString(v);
+        return v;
     }
 
-    private static String asString(Object o) {
-        return o == null ? null : o.toString();
+    private static String get(Map<String, Object> p, String local) {
+        // Prefer plain, then JSON-LD expanded
+        Object v = p.get(local);
+        if (v == null) v = p.get(EDC_NS + local);
+        return v == null ? null : v.toString();
+    }
+
+    private static String orDefault(Map<String, Object> p, String local, String def) {
+        var v = get(p, local);
+        return v == null ? def : v;
     }
 
     String jdbcUrl() { return jdbcUrl; }

@@ -28,8 +28,10 @@ class PostgresSource implements DataSource {
 
     @Override
     public StreamResult<Stream<Part>> openPartStream() {
+        monitor.info("[PG SRC  " + requestId + "] jdbcUrl=" + cfg.jdbcUrl() + " sql=" + cfg.sql());
         try {
             conn = DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password());
+            monitor.info("[PG SRC  " + requestId + "] connected");
             conn.setAutoCommit(false);
 
             var baseConn = conn.unwrap(BaseConnection.class);

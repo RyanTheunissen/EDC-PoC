@@ -18,5 +18,6 @@ public class DataPlanePostgresExtension implements ServiceExtension {
         monitor.info("Initializing Postgres data-plane extension");
         pipelineService.registerFactory(new PostgresSourceFactory(monitor));
         pipelineService.registerFactory(new PostgresSinkFactory(monitor));
+        monitor.info("Postgres factories registered");
     }
 }

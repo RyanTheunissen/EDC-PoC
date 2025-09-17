@@ -5,15 +5,14 @@
   "@id": "asset-users",
   "properties": {
     "name": "Users table",
-    "description": "Postgres users table exposed via JDBC",
-    "contenttype": "application/json"
+    "description": "Postgres users table exposed via COPY",
+    "contenttype": "text/csv"
   },
   "dataAddress": {
-    "type": "JdbcData",
-    "jdbc:url": "jdbc:postgresql://127.0.0.1:5432/pocdb",
-    "jdbc:user": "pocuser",
-    "jdbc:password": "pocpass",
-    "jdbc:driverClassName": "org.postgresql.Driver",
-    "sql:query": "SELECT * FROM users"
+    "type": "postgres",
+    "jdbcUrl": "jdbc:postgresql://100.93.225.17:5432/pocdb?sslmode=disable",
+    "user": "pocuser",
+    "password": "pocpass",
+    "sql": "SELECT email FROM public.users"
   }
 }

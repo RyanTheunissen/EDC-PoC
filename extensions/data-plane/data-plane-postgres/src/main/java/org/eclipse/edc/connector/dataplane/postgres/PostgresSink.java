@@ -25,44 +25,42 @@ class PostgresSink implements DataSink {
     @Override
     public CompletableFuture<StreamResult<Object>> transfer(DataSource source) {
         return CompletableFuture.supplyAsync(() -> {
-            if (cfg.table() == null || cfg.table().isEmpty()) {
-                return StreamResult.error("PostgresSink requires 'table' in destination DataAddress");
-            }
-
+            monitor.info("[PG SINK " + requestId + "] jdbcUrl=" + cfg.jdbcUrl()
+                    + " table=" + cfg.table()
+                    + " truncate=" + cfg.truncateBeforeLoad());
             try (var conn = DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password())) {
+                monitor.info("[PG SINK " + requestId + "] connected");
                 conn.setAutoCommit(false);
 
                 if (cfg.truncateBeforeLoad()) {
-                    try (var st = conn.createStatement()) {
-                        st.executeUpdate("TRUNCATE TABLE " + cfg.table() + " RESTART IDENTITY");
-                    }
+                    monitor.info("[PG SINK " + requestId + "] TRUNCATE " + cfg.table());
+                    try (var st = conn.createStatement()) { st.executeUpdate("TRUNCATE TABLE " + cfg.table() + " RESTART IDENTITY"); }
                 }
 
-                var baseConn = conn.unwrap(BaseConnection.class);
-                var cm = new CopyManager(baseConn);
+                var baseConn = conn.unwrap(org.postgresql.core.BaseConnection.class);
+                var cm = new org.postgresql.copy.CopyManager(baseConn);
 
                 var streamResult = source.openPartStream();
                 if (streamResult.failed()) {
-                    return StreamResult.error("Failed to open source stream: " + streamResult.getFailureMessages());
+                    monitor.severe("[PG SINK " + requestId + "] openPartStream FAILED: " + streamResult.getFailureMessages());
+                    return StreamResult.error("openPartStream failed: " + streamResult.getFailureMessages());
                 }
 
                 try (var parts = streamResult.getContent()) {
-                    var part = parts.findFirst()
-                            .orElseThrow(() -> new IllegalStateException("No part received from source"));
-
-                    try (InputStream in = part.openStream()) {
-                        var copySql = "COPY " + cfg.table() + " FROM STDIN WITH (FORMAT CSV, HEADER true)";
-                        long rows = cm.copyIn(copySql, in);
+                    var part = parts.findFirst().orElseThrow(() -> new IllegalStateException("no part"));
+                    monitor.info("[PG SINK " + requestId + "] COPY -> " + cfg.table());
+                    try (var in = part.openStream()) {
+                        long rows = cm.copyIn("COPY " + cfg.table() + " FROM STDIN WITH (FORMAT CSV, HEADER true)", in);
                         conn.commit();
-                        monitor.info("PostgresSink[" + requestId + "] copied " + rows + " rows into " + cfg.table());
+                        monitor.info("[PG SINK " + requestId + "] COPY done. rows=" + rows);
                     }
                 }
-
                 return StreamResult.success(null);
             } catch (Exception e) {
-                monitor.severe("PostgresSink[" + requestId + "] failed: " + e.getMessage(), e);
-                return StreamResult.error("PostgresSink error: " + e.getMessage());
+                monitor.severe("[PG SINK " + requestId + "] ERROR: " + e.getMessage(), e);
+                return StreamResult.error(e.getMessage());
             }
         });
     }
+
 }
