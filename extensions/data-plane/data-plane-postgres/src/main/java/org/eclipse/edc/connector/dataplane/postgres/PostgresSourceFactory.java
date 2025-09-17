@@ -4,13 +4,10 @@ import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSource;
 import org.eclipse.edc.connector.dataplane.spi.pipeline.DataSourceFactory;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.result.Result;
-import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowStartMessage;
-
-import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 class PostgresSourceFactory implements DataSourceFactory {
-    private static final String EDC_NS = "https://w3id.org/edc/v0.0.1/ns/";
     private final Monitor monitor;
 
     PostgresSourceFactory(Monitor monitor) { this.monitor = monitor; }
@@ -20,63 +17,47 @@ class PostgresSourceFactory implements DataSourceFactory {
 
     @Override
     public DataSource createSource(DataFlowStartMessage message) {
-        DataAddress src = message.getSourceDataAddress();
-        var cfg = PgCfg.fromAddress(src);
+        var cfg = PgCfg.fromAddress(message.getSourceDataAddress());
         monitor.info("PostgresSource[" + message.getProcessId() + "] cfg: jdbcUrl=" + cfg.jdbcUrl());
         return new PostgresSource(cfg, monitor, message.getProcessId());
     }
 
     @Override
-    public Result<Void> validateRequest(DataFlowStartMessage message) {
+    public @NotNull Result<Void> validateRequest(DataFlowStartMessage message) {
         var src = message.getSourceDataAddress();
         if (src == null) return Result.failure("Missing source DataAddress");
         if (!"postgres".equalsIgnoreCase(src.getType())) {
             return Result.failure("Unsupported source type: " + src.getType());
         }
 
-        var p = src.getProperties(); // Map<String, Object> with plain or JSON-LD-expanded keys
-        var miss = new java.util.ArrayList<String>();
-        require(p, "jdbcUrl", miss);
-        require(p, "user", miss);
-        require(p, "password", miss);
-        require(p, "sql", miss);
+        monitor.info("PostgresSource validate: type=" + src.getType() + ", props.keys=" + src.getProperties().keySet());
 
-        // Always log the actual keys we received for quick diagnosis
-        monitor.severe("PostgresSource validate: type=" + src.getType() + ", props.keys=" + p.keySet());
-
-        if (!miss.isEmpty()) {
-            return Result.failure("Source address missing: " + String.join(", ", miss)
-                    + " | type=" + src.getType()
-                    + " | props.keys=" + p.keySet());
+        final PgCfg cfg;
+        try {
+            cfg = PgCfg.fromAddress(src); // resolves json-LD and plain keys
+        } catch (IllegalArgumentException e) {
+            return Result.failure(e.getMessage());
         }
 
-        // Fast connectivity probe (3s) using resolved values (plain or namespaced)
-        try {
-            String jdbcUrl = getStr(p, "jdbcUrl");
-            String user = getStr(p, "user");
-            String password = getStr(p, "password");
+        // Ensure SQL is present
+        var sql = cfg.sql();
+        if (sql == null || sql.trim().isEmpty()) {
+            return Result.failure("Source address missing: sql");
+        }
 
-            java.sql.DriverManager.setLoginTimeout(3);
-            try (var c = java.sql.DriverManager.getConnection(jdbcUrl, user, password)) {
-                // ok
+        // Connectivity probe + sanity query
+        try (var c = java.sql.DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password());
+             var stmt = c.createStatement();
+             var rs = stmt.executeQuery("SELECT 1")) {
+
+            if (!rs.next()) {
+                return Result.failure("Source DB connectivity check failed: SELECT 1 returned no rows");
             }
+
         } catch (Exception e) {
             return Result.failure("Source DB connection failed: " + e.getMessage());
         }
+
         return Result.success();
-    }
-
-    /* ===== helpers that understand JSON-LD-expanded keys ===== */
-
-    private static void require(Map<String, Object> p, String local, java.util.List<String> miss) {
-        Object v = p.get(local);
-        if (v == null) v = p.get(EDC_NS + local);
-        if (v == null || v.toString().trim().isEmpty()) miss.add(local);
-    }
-
-    private static String getStr(Map<String, Object> p, String local) {
-        Object v = p.get(local);
-        if (v == null) v = p.get(EDC_NS + local);
-        return v == null ? null : v.toString();
     }
 }

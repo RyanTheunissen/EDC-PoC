@@ -46,7 +46,6 @@ final class PgCfg {
     }
 
     private static String get(Map<String, Object> p, String local) {
-        // Prefer plain, then JSON-LD expanded
         Object v = p.get(local);
         if (v == null) v = p.get(EDC_NS + local);
         return v == null ? null : v.toString();
