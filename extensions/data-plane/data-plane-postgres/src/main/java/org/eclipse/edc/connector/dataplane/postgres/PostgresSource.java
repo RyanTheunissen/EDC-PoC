@@ -18,8 +18,6 @@ class PostgresSource implements DataSource {
     private final Monitor monitor;
     private final String requestId;
 
-    private Connection conn; // keep open until close()
-
     PostgresSource(PgCfg cfg, Monitor monitor, String requestId) {
         this.cfg = cfg;
         this.monitor = monitor;
@@ -30,7 +28,8 @@ class PostgresSource implements DataSource {
     public StreamResult<Stream<Part>> openPartStream() {
         monitor.info("[PG SRC  " + requestId + "] jdbcUrl=" + cfg.jdbcUrl() + " sql=" + cfg.sql());
         try {
-            conn = DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password());
+            // Create a fresh connection per stream and keep it owned by the InputStream
+            final Connection conn = DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password());
             monitor.info("[PG SRC  " + requestId + "] connected");
             conn.setAutoCommit(false);
 
@@ -38,24 +37,24 @@ class PostgresSource implements DataSource {
             var cm = new CopyManager(baseConn);
 
             if (cfg.sql() == null || cfg.sql().isEmpty()) {
+                try { conn.close(); } catch (Exception ignore) {}
                 return StreamResult.error("PostgresSource requires 'sql' in source DataAddress");
             }
 
-            var copySql = "COPY (" + cfg.sql() + ") TO STDOUT WITH (FORMAT CSV, HEADER true)";
-            CopyOut copyOut = cm.copyOut(copySql);
+            final String copySql = "COPY (" + cfg.sql() + ") TO STDOUT WITH (FORMAT CSV, HEADER true)";
+            final CopyOut copyOut = cm.copyOut(copySql);
 
             InputStream inputStream = new InputStream() {
                 private byte[] buffer = null;
                 private int pos = 0;
+                private boolean closed = false;
 
                 @Override
                 public int read() throws IOException {
                     if (buffer == null || pos >= buffer.length) {
                         try {
-                            buffer = copyOut.readFromCopy();
-                            if (buffer == null) {
-                                return -1;
-                            }
+                            buffer = copyOut.readFromCopy(); // null => EOF
+                            if (buffer == null) return -1;
                             pos = 0;
                         } catch (Exception e) {
                             throw new IOException(e);
@@ -66,35 +65,32 @@ class PostgresSource implements DataSource {
 
                 @Override
                 public int read(byte[] b, int off, int len) throws IOException {
-                    int firstByte = read();
-                    if (firstByte == -1) {
-                        return -1;
-                    }
-                    b[off] = (byte) firstByte;
+                    int first = read();
+                    if (first == -1) return -1;
+                    b[off] = (byte) first;
                     int count = 1;
                     while (count < len) {
                         int next = read();
-                        if (next == -1) {
-                            break;
-                        }
-                        b[off + count] = (byte) next;
-                        count++;
+                        if (next == -1) break;
+                        b[off + count++] = (byte) next;
                     }
                     return count;
                 }
-            };
 
+                @Override
+                public void close() throws IOException {
+                    if (closed) return;
+                    closed = true;
+                    try { copyOut.cancelCopy(); } catch (Exception ignore) {}
+                    try { conn.close(); } catch (Exception ignore) {}
+                }
+            };
 
             Part part = new Part() {
                 @Override
-                public String name() {
-                    return "postgres-part";
-                }
-
+                public String name() { return "postgres-part"; }
                 @Override
-                public InputStream openStream() {
-                    return inputStream;
-                }
+                public InputStream openStream() { return inputStream; }
             };
 
             return StreamResult.success(Stream.of(part));
@@ -106,8 +102,6 @@ class PostgresSource implements DataSource {
 
     @Override
     public void close() throws Exception {
-        if (conn != null && !conn.isClosed()) {
-            conn.close();
-        }
+        // NO-OP: the InputStream owns closing the COPY and the JDBC connection.
     }
 }
