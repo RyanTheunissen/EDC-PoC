@@ -7,7 +7,6 @@ import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowStartMessage;
 import org.jetbrains.annotations.NotNull;
 
-
 class PostgresSinkFactory implements DataSinkFactory {
     private final Monitor monitor;
 
@@ -19,7 +18,7 @@ class PostgresSinkFactory implements DataSinkFactory {
     @Override
     public DataSink createSink(DataFlowStartMessage message) {
         var dest = message.getDestinationDataAddress();
-        var cfg = PgCfg.fromAddress(dest);
+        var cfg = PgCfg.fromAddress(dest); // JSON-LD aware
         monitor.info("PostgresSink[" + message.getProcessId() + "] cfg: jdbcUrl=" + cfg.jdbcUrl() + ", table=" + cfg.table());
         return new PostgresSink(cfg, monitor, message.getProcessId());
     }
@@ -32,38 +31,47 @@ class PostgresSinkFactory implements DataSinkFactory {
             return Result.failure("Unsupported destination type: " + dest.getType());
         }
 
-        monitor.info("PostgresSink validate: type=" + dest.getType() + ", props.keys=" + dest.getProperties().keySet());
+        monitor.severe("PostgresSink validate: type=" + dest.getType() + ", props.keys=" + dest.getProperties().keySet());
 
-        PgCfg cfg;
+        final PgCfg cfg;
         try {
             cfg = PgCfg.fromAddress(dest); // resolves json-LD and plain keys
         } catch (IllegalArgumentException e) {
             return Result.failure(e.getMessage());
         }
 
-        // check table is present
         var table = cfg.table();
         if (table == null || table.trim().isEmpty()) {
             return Result.failure("Destination address missing: table");
         }
 
-        // Connectivity check
         try {
             java.sql.DriverManager.setLoginTimeout(3);
             try (var c = java.sql.DriverManager.getConnection(cfg.jdbcUrl(), cfg.user(), cfg.password())) {
-                String schema = "public", name = cfg.table();
-                var parts = name.split("\\.", 2);
+                String schema = "public", name = table;
+                var parts = table.split("\\.", 2);
                 if (parts.length == 2) { schema = parts[0]; name = parts[1]; }
+
                 try (var rs = c.getMetaData().getTables(null, schema, name, null)) {
-                    if (!rs.next()) {
-                        return Result.failure("Destination table not found: " + cfg.table() + " (schema=" + schema + ")");
+                    if (rs.next()) {
+                        return Result.success();
                     }
                 }
+
+                if (!cfg.createIfMissing()) {
+                    return Result.failure("Destination table not found: " + table +
+                            ". Set createIfMissing=true or pre-create the table.");
+                }
+
+                boolean hasDdl = cfg.columnsDdl() != null && !cfg.columnsDdl().isBlank();
+                boolean hasCols = cfg.columns() != null && !cfg.columns().isBlank();
+                if (!hasDdl && !hasCols) {
+                    return Result.failure("createIfMissing=true but neither 'columnsDdl' nor 'columns' provided.");
+                }
+                return Result.success();
             }
         } catch (Exception e) {
             return Result.failure("Destination DB connection failed: " + e.getMessage());
         }
-
-        return Result.success();
     }
 }
