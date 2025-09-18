@@ -24,18 +24,17 @@ final class PgCfg {
     }
 
     static PgCfg fromAddress(DataAddress a) {
-        Map<String, Object> p = a.getProperties();
+        var p = a.getProperties();
+        var truncStr = get(p, "truncateBeforeLoad");
         return new PgCfg(
                 require(p, "jdbcUrl"),
                 require(p, "user"),
                 require(p, "password"),
                 get(p, "sql"),
                 get(p, "table"),
-                Boolean.parseBoolean(orDefault(p, "truncateBeforeLoad", "false"))
+                Boolean.parseBoolean(truncStr)
         );
     }
-
-    /* === helpers that understand JSON-LD-expanded keys === */
 
     private static String require(Map<String, Object> p, String local) {
         var v = get(p, local);
@@ -49,11 +48,6 @@ final class PgCfg {
         Object v = p.get(local);
         if (v == null) v = p.get(EDC_NS + local);
         return v == null ? null : v.toString();
-    }
-
-    private static String orDefault(Map<String, Object> p, String local, String def) {
-        var v = get(p, local);
-        return v == null ? def : v;
     }
 
     String jdbcUrl() { return jdbcUrl; }
