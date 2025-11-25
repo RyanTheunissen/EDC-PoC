@@ -1,0 +1,107 @@
+services:
+  provider:
+    build: ./provider
+    container_name: provider
+    ports:
+      - "19191:19191" # /api
+      - "19192:19192" # /control
+      - "19193:19193" # /management
+      - "19194:19194" # /protocol (DSP)
+      - "19291:19291" # /public
+    depends_on:
+      - vault
+      - azurite
+      - azurite-init
+
+  consumer:
+    build: ./consumer
+    container_name: consumer
+    ports:
+      - "29191:29191" # /api
+      - "29192:29192" # /control
+      - "29193:29193" # /management
+      - "29194:29194" # /protocol (DSP)
+      - "29291:29291" # /public
+    depends_on:
+      - vault
+      - minio
+
+  azurite:
+    container_name: azurite
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    environment:
+      AZURITE_ACCOUNTS: provider:password
+
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: consumer
+      MINIO_ROOT_PASSWORD: password
+
+  vault:
+    container_name: vault
+    image: hashicorp/vault
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "<root-token>"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+
+  vault-init:
+    image: hashicorp/vault
+    container_name: vault-init
+    depends_on:
+      - vault
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: "<root-token>"
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >
+      "
+      echo 'Waiting for Vault...';
+      until vault status >/dev/null 2>&1; do
+        sleep 1;
+      done;
+      echo 'Seeding secrets into Vault...';
+      vault kv put secret/accessKeyId      content=consumer &&
+      vault kv put secret/secretAccessKey  content=password &&
+      vault kv put secret/provider-key     content=password;
+      echo 'Vault init done.';
+      "
+    restart: "no"
+
+  minio-init:
+    image: minio/mc
+    container_name: minio-init
+    depends_on:
+      - minio
+    restart: on-failure
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set dockerminio http://minio:9000 consumer password;
+      /usr/bin/mc mb dockerminio/src-bucket;
+      exit 0;
+      "
+  azurite-init:
+    image: mcr.microsoft.com/azure-cli
+    container_name: azurite-init
+    depends_on:
+      - azurite
+    volumes:
+      - ./scripts/init-azurite.sh:/init-azurite.sh:ro
+      - ./provider/resources:/resources:ro
+    entrypoint: [ "/bin/sh", "/init-azurite.sh" ]
+    restart: "no"
