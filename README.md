@@ -52,7 +52,9 @@ docker compose -f consumer/resources/docker-compose-consumer.yaml up -d
 
 ## Configure Vault
 
-export VAULT_ADDR='http://0.0.0.0:8200'  
+[//]: # (export VAULT_ADDR='http://0.0.0.0:8200' )
+[//]: # (below is for running in docker container)
+export VAULT_ADDR='http://127.0.0.1:8200'
 export VAULT_TOKEN='<root-token>'  
 vault kv put secret/accessKeyId content=consumer  
 vault kv put secret/secretAccessKey content=password  
