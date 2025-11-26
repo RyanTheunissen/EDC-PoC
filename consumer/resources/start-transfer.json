@@ -4,7 +4,7 @@
   },
   "@type": "TransferRequestDto",
   "connectorId": "provider",
-  "counterPartyAddress": "http://100.93.225.17:19194/protocol",
+  "counterPartyAddress": "http://provider:19194/protocol",
   "contractId": "070db663-5b97-4f10-86f9-35b3da8582b5",
   "protocol": "dataspace-protocol-http",
   "transferType": "AmazonS3-PUSH",
@@ -13,6 +13,6 @@
     "region": "eu-west-1",
     "bucketName": "src-bucket",
     "objectName": "test-document.txt",
-    "endpointOverride": "http://100.78.21.5:9000"
+    "endpointOverride": "http://minio:9000"
   }
 }
