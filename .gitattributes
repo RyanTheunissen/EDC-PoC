@@ -1,0 +1,2 @@
+# Ensure shell scripts keep Linux line endings (azurite seeding problem on test pc)
+*.sh text eol=lf
