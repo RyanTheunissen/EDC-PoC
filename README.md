@@ -4,6 +4,16 @@ This project demonstrates a simple setup of **Provider** and **Consumer** connec
 
 ---
 
+## Starting Sandbox
+
+To just setup everything in docker containers and seed the assets etc. use:
+
+
+```bash
+docker-compose up --build
+```
+---
+
 ## Build Project
 
 Generate the Gradle wrapper.
@@ -23,7 +33,6 @@ Or build only shadow JARs:
 ./gradlew :provider:shadowJar
 
 ---
-docker-compose up --build
 
 ## Start Docker Containers
 
