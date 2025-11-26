@@ -23,6 +23,7 @@ Or build only shadow JARs:
 ./gradlew :provider:shadowJar
 
 ---
+docker-compose up --build
 
 ## Start Docker Containers
 
