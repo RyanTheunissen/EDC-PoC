@@ -1,6 +1,8 @@
 services:
   provider:
-    build: ./provider
+    build:
+      context: .
+      dockerfile: provider/Dockerfile
     container_name: provider
     ports:
       - "19191:19191" # /api
@@ -14,7 +16,9 @@ services:
       - azurite-init
 
   consumer:
-    build: ./consumer
+    build:
+        context: .
+        dockerfile: consumer/Dockerfile
     container_name: consumer
     ports:
       - "29191:29191" # /api
