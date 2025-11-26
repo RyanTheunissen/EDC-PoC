@@ -38,7 +38,7 @@ docker compose -f consumer/resources/docker-compose-consumer.yaml up -d
 ## Upload File to Azure Blob Storage
 
 1. Set the connection string:  
-   conn_str="DefaultEndpointsProtocol=http;AccountName=provider;AccountKey=password;BlobEndpoint=http://100.93.225.17:10000/provider;"
+   conn_str="DefaultEndpointsProtocol=http;AccountName=provider;AccountKey=password;BlobEndpoint=http://localhost:10000/provider;"
 
 2. Create a container:  
    az storage container create --name src-container --connection-string $conn_str
@@ -96,16 +96,16 @@ The provider automatically creates the following at startup:
 ## 2. Consumer API Calls
 
 ### Fetch Catalog
-curl -X POST "http://100.78.21.5:29193/management/v3/catalog/request" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/fetch-catalog.json -s | jq
+curl -X POST "http://localhost:29193/management/v3/catalog/request" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/fetch-catalog.json -s | jq
 
 ### Negotiate Contract
-curl -d @consumer/resources/negotiate-contract.json -H "X-Api-Key: password" -H "Content-Type: application/json" -X POST http://100.78.21.5:29193/management/v3/contractnegotiations -s | jq
+curl -d @consumer/resources/negotiate-contract.json -H "X-Api-Key: password" -H "Content-Type: application/json" -X POST http://localhost:29193/management/v3/contractnegotiations -s | jq
 
 ### Get Contract ID
-curl -X GET "http://100.78.21.5:29193/management/v3/contractnegotiations/<contract-id>" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+curl -X GET "http://localhost:29193/management/v3/contractnegotiations/<contract-id>" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
 
 ### Start Transfer
-curl -X POST "http://100.78.21.5:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer.json -s | jq
+curl -X POST "http://localhost:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer.json -s | jq
 
 ---
 
