@@ -1,11 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
-# Inside Docker we talk to Azurite by service name, not host IP
 conn_str="DefaultEndpointsProtocol=http;AccountName=provider;AccountKey=password;BlobEndpoint=http://azurite:10000/provider;"
 
 echo "Waiting for Azurite..."
-# Wait until Azurite is actually reachable
 until az storage container list --connection-string "$conn_str" --auth-mode key >/dev/null 2>&1; do
   sleep 1
 done
