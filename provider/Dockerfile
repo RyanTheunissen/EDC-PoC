@@ -1,5 +1,5 @@
 # Build the provider jar with Gradle
-FROM gradle:8.10-jdk17-alpine AS build
+FROM gradle:8.10-jdk17-corretto AS build
 
 WORKDIR /workspace
 
