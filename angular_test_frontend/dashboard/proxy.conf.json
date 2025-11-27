@@ -1,0 +1,17 @@
+{
+  "/management": {
+    "target": "http://localhost:29193",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/provider": {
+    "target": "http://provider:19193",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/provider": ""
+    }
+  }
+}

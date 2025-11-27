@@ -1,0 +1,118 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.subtitle {
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+textarea {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem;
+  resize: vertical;
+  min-height: 140px;
+  box-sizing: border-box;
+}
+
+button {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: #2563eb;
+  color: white;
+  transition: transform 0.05s ease, box-shadow 0.05s ease, background 0.1s ease;
+}
+
+button:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+}
+
+.actions {
+  margin-bottom: 1rem;
+}
+
+.run-all {
+  background: #16a34a;
+}
+
+.run-all:hover {
+  background: #15803d;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
+.result {
+  border-radius: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.status {
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.75rem;
+  background: #e0f2fe;
+  color: #075985;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.status.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+pre {
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #020617;
+  color: #e5e7eb;
+}
