@@ -12,45 +12,6 @@ services:
       - "19291:19291" # /public
     depends_on:
       - vault
-      - azurite
-      - azurite-init
-
-  consumer:
-    build:
-        context: .
-        dockerfile: consumer/Dockerfile
-    container_name: consumer
-    ports:
-      - "29191:29191" # /api
-      - "29192:29192" # /control
-      - "29193:29193" # /management
-      - "29194:29194" # /protocol (DSP)
-      - "29291:29291" # /public
-    depends_on:
-      - vault
-      - minio
-
-  azurite:
-    container_name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite
-    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    environment:
-      AZURITE_ACCOUNTS: provider:password
-
-  minio:
-    container_name: minio
-    image: quay.io/minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: consumer
-      MINIO_ROOT_PASSWORD: password
 
   vault:
     container_name: vault
@@ -86,26 +47,4 @@ services:
       "
     restart: "no"
 
-  minio-init:
-    image: minio/mc
-    container_name: minio-init
-    depends_on:
-      - minio
-    restart: on-failure
-    entrypoint: >
-      /bin/sh -c "
-      sleep 5;
-      /usr/bin/mc alias set dockerminio http://minio:9000 consumer password;
-      /usr/bin/mc mb dockerminio/src-bucket;
-      exit 0;
-      "
-  azurite-init:
-    image: mcr.microsoft.com/azure-cli
-    container_name: azurite-init
-    depends_on:
-      - azurite
-    volumes:
-      - ./scripts/init-azurite.sh:/init-azurite.sh:ro
-      - ./provider/resources:/resources:ro
-    entrypoint: [ "/bin/sh", "/init-azurite.sh" ]
-    restart: "no"
+
