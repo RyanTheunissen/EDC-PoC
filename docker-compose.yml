@@ -5,11 +5,11 @@ services:
       dockerfile: provider/Dockerfile
     container_name: provider
     ports:
-      - "19191:19191" # /api
-      - "19192:19192" # /control
-      - "19193:19193" # /management
-      - "19194:19194" # /protocol (DSP)
-      - "19291:19291" # /public
+      - "19191:19191"
+      - "19192:19192"
+      - "19193:19193"
+      - "19194:19194"
+      - "19291:19291"
     depends_on:
       - vault
 
