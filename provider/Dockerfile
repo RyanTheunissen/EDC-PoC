@@ -1,11 +1,3 @@
-FROM gradle:8.10-jdk17-jammy AS build
-
-WORKDIR /workspace
-
-COPY . .
-
-RUN gradle :provider:build -x test --no-daemon
-
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
