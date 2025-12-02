@@ -13,6 +13,6 @@
     "region": "eu-west-1",
     "bucketName": "src-bucket",
     "objectName": "test-document.txt",
-    "endpointOverride": "http://minio:9000"
+    "endpointOverride": "http://100.93.225.17:9000"
   }
 }
