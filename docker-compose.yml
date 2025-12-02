@@ -10,6 +10,9 @@ services:
       - "19193:19193"
       - "19194:19194"
       - "19291:19291"
+    environment:
+      AWS_ACCESS_KEY_ID: consumer
+      AWS_SECRET_ACCESS_KEY: password
     depends_on:
       - vault
 
