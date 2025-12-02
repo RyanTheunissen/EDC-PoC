@@ -1,0 +1,14 @@
+{
+  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@id": "12",
+  "properties": {
+    "name": "Test csv",
+    "description": "local test csv"
+  },
+  "dataAddress": {
+    "@type": "DataAddress",
+    "type": "HttpData",
+    "baseUrl": "http://100.101.111.95:8080/test.csv",
+    "proxyPath": "false"
+  }
+}
