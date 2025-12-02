@@ -3,18 +3,16 @@
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
   "@type": "ContractRequest",
-  "counterPartyAddress": "http://provider:19194/protocol",
+  "counterPartyAddress": "http:/100.101.111.95:19194/protocol",
   "protocol": "dataspace-protocol-http",
   "policy": {
+    "@id": "MTI=:MTI=:YWZjZTU3NDMtMDc3Mi00NjNiLWIyMWYtNzU5OWYzN2MxZTdl",
+    "@type": "odrl:Offer",
+    "odrl:permission": [],
+    "odrl:prohibition": [],
+    "odrl:obligation": [],
     "@context": "http://www.w3.org/ns/odrl.jsonld",
-    "@id": "MQ==:MQ==:MTNmOWJhYmMtMTlhMi00YjZiLTkzODEtM2FlMWQ5N2JhYjgz",
-    "@type": "Offer",
     "assigner": "provider",
-    "target": "1",
-    "odrl:permission": {
-      "odrl:action": {
-          "odrl:type": "USE"
-      }
-    }
+    "target": "12"
   }
 }
