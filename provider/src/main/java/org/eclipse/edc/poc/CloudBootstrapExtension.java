@@ -64,7 +64,7 @@ public class CloudBootstrapExtension implements ServiceExtension {
                 .build();
 
         var asset = Asset.Builder.newInstance()
-                .id("1")
+                .id("Bodegraven")
                 .dataAddress(dataAddress)
                 .build();
 
