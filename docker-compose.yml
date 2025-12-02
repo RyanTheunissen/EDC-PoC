@@ -56,4 +56,4 @@ services:
     volumes:
       - /home/dataspace1/shared:/usr/share/nginx/html:ro
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
