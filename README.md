@@ -111,10 +111,14 @@ curl -X POST "http://localhost:29193/management/v3/catalog/request" -H "X-Api-Ke
 curl -d @consumer/resources/negotiate-contract.json -H "X-Api-Key: password" -H "Content-Type: application/json" -X POST http://localhost:29193/management/v3/contractnegotiations -s | jq
 
 ### Get Contract ID
-curl -X GET "http://localhost:29193/management/v3/contractnegotiations/<contract-id>" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+curl -X GET "http://localhost:29193/management/v3/contractnegotiations/63f79bdb-1779-4f2b-aaee-9a1edd5892ca" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
 
 ### Start Transfer
 curl -X POST "http://localhost:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer.json -s | jq
+
+### Transfer Status
+curl -X GET "http://localhost:29193/management/v3/transferprocesses/e0009a57-a42e-478d-b9c4-6ab42bc51754" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+
 
 ---
 
@@ -127,3 +131,15 @@ docker compose -f provider/resources/docker-compose-provider.yaml down
 docker compose -f consumer/resources/docker-compose-consumer.yaml down
 
 ---
+
+### Create asset
+
+curl -X POST "http://100.101.111.95:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-asset.json -s | jq
+
+### Create policy definition
+
+curl -X POST "http://100.101.111.95:19193/management/v3/policydefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-policy.json -s | jq
+
+### Create contract definition
+
+curl -X POST "http://100.101.111.95:19193/management/v3/contractdefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/contract-definition.json -s | jq
