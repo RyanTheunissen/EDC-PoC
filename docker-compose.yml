@@ -47,4 +47,10 @@ services:
       "
     restart: "no"
 
-
+  file-server:
+    image: nginx:alpine
+    container_name: pi-file-server
+    volumes:
+      - /home/dataspace1/shared:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
