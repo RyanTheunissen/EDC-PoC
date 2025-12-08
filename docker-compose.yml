@@ -14,6 +14,12 @@ services:
       - vault
       - azurite
       - azurite-init
+    environment:
+      # Tell the JVM to use our JUL config
+      - JAVA_TOOL_OPTIONS=-Djava.util.logging.config.file=/app/config/logging.properties
+    volumes:
+      # Mount the logging config into the container
+      - ./config/logging.properties:/app/config/logging.properties:ro
 
   consumer:
     build:
@@ -79,9 +85,9 @@ services:
         sleep 1;
       done;
       echo 'Seeding secrets into Vault...';
-      vault kv put secret/accessKeyId      content=consumer &&
-      vault kv put secret/secretAccessKey  content=password &&
-      vault kv put secret/provider-key     content=password;
+      vault kv put secret/edc.aws.access.key         content=consumer &&
+      vault kv put secret/edc.aws.secret.access.key  content=password &&
+      vault kv put secret/provider-key               content=password;
       echo 'Vault init done.';
       "
     restart: "no"
