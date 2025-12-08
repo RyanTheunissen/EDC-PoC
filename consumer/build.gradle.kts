@@ -8,7 +8,7 @@ application {
 }
 
 java {
-    toolchain { languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(17)) }
+    toolchain { languageVersion.set(JavaLanguageVersion.of(17)) }
 }
 
 dependencies {
@@ -51,6 +51,12 @@ dependencies {
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
 
     implementation("org.eclipse.edc:validator-data-address-http-data:$edc")
+
+    // Logging
+    runtimeOnly("org.eclipse.edc:monitor-jdk-logger:$edc")
+
+    // Jackson's objectmapper
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
 }
 
 tasks.shadowJar {
