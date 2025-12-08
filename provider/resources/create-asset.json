@@ -8,7 +8,7 @@
   "dataAddress": {
     "@type": "DataAddress",
     "type": "HttpData",
-    "baseUrl": "http://100.101.111.95:8080/test.csv",
+    "baseUrl": "http://pi-file-server/test.csv",
     "proxyPath": "false"
   }
 }
