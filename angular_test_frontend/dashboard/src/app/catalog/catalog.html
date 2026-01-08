@@ -33,6 +33,15 @@
     <button type="submit" [disabled]="loading">
       {{ loading ? 'Bezig...' : 'Fetch catalog' }}
     </button>
+
+    <button
+      type="button"
+      (click)="onFetchFederatedCatalog()"
+      [disabled]="loading"
+      style="margin-left: 0.5rem;"
+    >
+      {{ loading ? 'Bezig...' : 'Fetch federated catalog (alle providers)' }}
+    </button>
   </form>
 
   <div *ngIf="error" style="color: red; margin-top: 0.5rem;">
@@ -43,9 +52,9 @@
     <h2>Assets</h2>
     <div
       style="
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
       "
     >
       <div
@@ -61,6 +70,10 @@
         "
       >
         <h3 style="margin-top: 0;">Asset {{ asset.id }}</h3>
+
+        <p style="margin: 0.25rem 0; font-size: 0.85rem;">
+          <strong>Provider:</strong> {{ asset.providerLabel }}
+        </p>
 
         <p style="margin: 0.25rem 0;">
           <strong>Offer ID:</strong><br />

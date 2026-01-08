@@ -1,15 +1,27 @@
-// file: `angular_test_frontend/dashboard/src/app/catalog/catalog.component.ts`
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { CatalogService, CatalogRequest } from '../services/catalog.service';
+
+interface ProviderEndpoint {
+  label: string;                // display name in UI
+  counterPartyAddress: string;  // /protocol endpoint
+  protocol: string;
+}
 
 interface AssetCard {
   id: string;
   offerId: string;
   formats: string[];
   rawDataset: any;
+
+  // federated info
+  providerLabel: string;
+  providerAddress: string;
+  protocol: string;
+  participantId: string;
 }
 
 @Component({
@@ -26,6 +38,19 @@ interface AssetCard {
 export class Catalog {
   counterPartyAddress = 'http://provider:19194/protocol';
   protocol = 'dataspace-protocol-http';
+
+  providerEndpoints: ProviderEndpoint[] = [
+    {
+      label: 'bodegraven',
+      counterPartyAddress: 'http://100.92.114.63:19194/protocol',
+      protocol: 'dataspace-protocol-http'
+    },
+    {
+      label: 'dataspace1',
+      counterPartyAddress: 'http://100.101.111.95:19194/protocol',
+      protocol: 'dataspace-protocol-http'
+    }
+  ];
 
   loading = false;
   error: string | null = null;
@@ -53,6 +78,7 @@ export class Catalog {
 
   constructor(private catalogService: CatalogService) {}
 
+  // === Single-provider catalog fetch (uses the form fields) ===
   onFetchCatalog() {
     this.loading = true;
     this.error = null;
@@ -69,16 +95,71 @@ export class Catalog {
       protocol: this.protocol
     };
 
+    // provider descriptor based on current form values
+    const provider: ProviderEndpoint = {
+      label: 'Handmatig ingevoerd',
+      counterPartyAddress: this.counterPartyAddress,
+      protocol: this.protocol
+    };
+
     this.catalogService.fetchCatalog(request).subscribe({
       next: (response) => {
         this.rawCatalog = response;
         this.participantId = response['dspace:participantId'] || 'provider';
-        this.assets = this.mapToAssets(response);
+        this.assets = this.mapToAssets(response, provider, this.participantId ?? 'unknown participant');
         this.loading = false;
       },
       error: (err) => {
         console.error('Catalog error', err);
         this.error = 'Kon catalogus niet ophalen (zie console voor details).';
+        this.loading = false;
+      }
+    });
+  }
+
+  onFetchFederatedCatalog() {
+    this.loading = true;
+    this.error = null;
+    this.assets = [];
+    this.selectedAsset = null;
+    this.rawCatalog = null;
+    this.participantId = null;
+
+    if (this.providerEndpoints.length === 0) {
+      this.loading = false;
+      this.error = 'Geen provider endpoints geconfigureerd.';
+      return;
+    }
+
+    const requests = this.providerEndpoints.map((p) => {
+      const req: CatalogRequest = {
+        '@context': {
+          '@vocab': 'https://w3id.org/edc/v0.0.1/ns/'
+        },
+        counterPartyAddress: p.counterPartyAddress,
+        protocol: p.protocol
+      };
+      return this.catalogService.fetchCatalog(req);
+    });
+
+    forkJoin(requests).subscribe({
+      next: (responses) => {
+        const allAssets: AssetCard[] = [];
+
+        responses.forEach((resp, idx) => {
+          const provider = this.providerEndpoints[idx];
+          const participantId = resp['dspace:participantId'] || provider.label;
+          const mapped = this.mapToAssets(resp, provider, participantId);
+          allAssets.push(...mapped);
+        });
+
+        this.assets = allAssets;
+        this.rawCatalog = responses; // array of raw catalog responses
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Federated catalog error', err);
+        this.error = 'Federated catalog ophalen faalde (zie console).';
         this.loading = false;
       }
     });
@@ -92,8 +173,17 @@ export class Catalog {
     this.transferResponse = null;
     this.transferJsonText = '';
 
-    const rawPolicy = asset.rawDataset['odrl:hasPolicy'] || asset.rawDataset['odrl:policy'] || {};
-    const policyFromCatalog = Array.isArray(rawPolicy) ? rawPolicy[0] : rawPolicy || {};
+    this.counterPartyAddress = asset.providerAddress;
+    this.protocol = asset.protocol;
+    this.participantId = asset.participantId;
+
+    const rawPolicy =
+      asset.rawDataset['odrl:hasPolicy'] ||
+      asset.rawDataset['odrl:policy'] ||
+      {};
+    const policyFromCatalog = Array.isArray(rawPolicy)
+      ? rawPolicy[0]
+      : rawPolicy || {};
 
     const policyClone = Object.keys(policyFromCatalog).length
       ? JSON.parse(JSON.stringify(policyFromCatalog))
@@ -125,7 +215,11 @@ export class Catalog {
     this.negotiationJsonText = JSON.stringify(contractRequestBody, null, 2);
   }
 
-  private mapToAssets(catalog: any): AssetCard[] {
+  private mapToAssets(
+    catalog: any,
+    provider: ProviderEndpoint,
+    participantId: string
+  ): AssetCard[] {
     if (!catalog) return [];
 
     const datasets = catalog['dcat:dataset'];
@@ -140,7 +234,9 @@ export class Catalog {
       const offerId = offer['@id'] || '';
 
       const distributions = ds['dcat:distribution'] || [];
-      const distArray = Array.isArray(distributions) ? distributions : [distributions];
+      const distArray = Array.isArray(distributions)
+        ? distributions
+        : [distributions];
 
       const formats = distArray
         .map((d: any) => d?.['dct:format']?.['@id'])
@@ -150,7 +246,11 @@ export class Catalog {
         id,
         offerId,
         formats,
-        rawDataset: ds
+        rawDataset: ds,
+        providerLabel: provider.label,
+        providerAddress: provider.counterPartyAddress,
+        protocol: provider.protocol,
+        participantId
       } as AssetCard;
     });
   }
@@ -185,7 +285,8 @@ export class Catalog {
       },
       error: (err) => {
         console.error('Negotiation error', err);
-        this.negotiationError = 'Negotiation request faalde (zie console voor details).';
+        this.negotiationError =
+          'Negotiation request faalde (zie console voor details).';
         this.negotiationLoading = false;
       }
     });
@@ -221,9 +322,9 @@ export class Catalog {
             transferType: 'AmazonS3-PUSH',
             dataDestination: {
               type: 'AmazonS3',
-              region: 'eu-west-1',
+              region: 'us-east-1',
               bucketName: 'src-bucket',
-              objectName: 'test-document.txt',
+              objectName: 'test.csv',
               endpointOverride: 'http://minio:9000'
             }
           };
@@ -233,7 +334,8 @@ export class Catalog {
       },
       error: (err) => {
         console.error('Negotiation status error', err);
-        this.negotiationStatusError = 'Kon negotiation status niet ophalen (zie console).';
+        this.negotiationStatusError =
+          'Kon negotiation status niet ophalen (zie console).';
         this.negotiationStatusLoading = false;
       }
     });
