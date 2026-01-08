@@ -12,7 +12,7 @@ java {
 }
 
 dependencies {
-    val edc = "0.13.2"
+    val edc = "0.14.1"
 
     // Core runtime + connector
     implementation("org.eclipse.edc:runtime-core:$edc")
@@ -27,8 +27,8 @@ dependencies {
     implementation("org.eclipse.edc:dsp:$edc")
     implementation("org.eclipse.edc:http:$edc")
     implementation("org.eclipse.edc:configuration-filesystem:$edc")
-    implementation("org.eclipse.edc:iam-mock:$edc")                    // fixes IdentityService/AudienceResolver
-    implementation("org.eclipse.edc:edr-store-core:$edc")              // fixes EDR store injection
+    implementation("org.eclipse.edc:iam-mock:$edc")                    // fixes IdentityService
+    implementation("org.eclipse.edc:edr-store-core:$edc")              // management API needs this for an endpoint. Not used at the moment.
     implementation("org.eclipse.edc:transfer-data-plane-signaling:$edc")
     implementation("org.eclipse.edc:validator-data-address-http-data:$edc")
 
@@ -51,6 +51,8 @@ dependencies {
 
     // Jackson's objectmapper
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+
+    implementation("org.eclipse.edc:contract-spi:${edc}")
 }
 
 tasks.shadowJar {

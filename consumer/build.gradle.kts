@@ -12,7 +12,7 @@ java {
 }
 
 dependencies {
-    val edc = "0.13.2"
+    val edc = "0.14.1"
 
     // Core runtime + connector
     implementation("org.eclipse.edc:runtime-core:$edc")
@@ -26,11 +26,10 @@ dependencies {
     implementation("org.eclipse.edc:http:$edc")
     implementation("org.eclipse.edc:configuration-filesystem:$edc")
 
-    // 🔻 Add these missing ones
     implementation("org.eclipse.edc:control-plane-api-client:$edc")     // fixes TransferProcessApiClient usage
     implementation("org.eclipse.edc:control-api-configuration:$edc")    // fixes ControlApiUrl
-    implementation("org.eclipse.edc:iam-mock:$edc")                     // fixes IdentityService/AudienceResolver
-    implementation("org.eclipse.edc:edr-store-core:$edc")               // fixes EDR store
+    implementation("org.eclipse.edc:iam-mock:$edc")                     // fixes IdentityService
+    implementation("org.eclipse.edc:edr-store-core:$edc")               // management API needs this for an endpoint. Not used at the moment.
 
     // Data plane + signaling + selector
     implementation("org.eclipse.edc:data-plane-core:$edc")
@@ -42,7 +41,6 @@ dependencies {
     implementation("org.eclipse.edc:transfer-data-plane-signaling:$edc")
     implementation("org.eclipse.edc:data-plane-public-api-v2:$edc")
 
-    // 🔻 Add client impl for transfer DP signaling
     implementation("org.eclipse.edc:data-plane-signaling-client:$edc")
 
     // Storage + Vault (ok to keep even if you use PUSH)
