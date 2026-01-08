@@ -7,4 +7,4 @@ dependencyResolutionManagement {
     repositories { mavenCentral(); mavenLocal() }
 }
 
-include("provider", "consumer")
+include("provider")

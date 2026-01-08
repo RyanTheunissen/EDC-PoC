@@ -12,7 +12,7 @@ java {
 }
 
 dependencies {
-    val edc = "0.13.2"
+    val edc = "0.14.1"
 
     // Core runtime + connector
     implementation("org.eclipse.edc:runtime-core:$edc")
