@@ -5,14 +5,11 @@
   "@type": "TransferRequestDto",
   "connectorId": "provider",
   "counterPartyAddress": "http://100.101.111.95:19194/protocol",
-  "contractId": "540bb8ec-159a-400e-b3c5-5ffa98671e0d",
+  "contractId": "e4ff8912-ded7-4e4b-ad89-2123b18bcf95",
   "protocol": "dataspace-protocol-http",
-  "transferType": "AmazonS3-PUSH",
+  "transferType": "HttpData-PUSH",
   "dataDestination": {
-    "type": "AmazonS3",
-    "region": "eu-west-1",
-    "bucketName": "src-bucket",
-    "objectName": "test.csv",
-    "endpointOverride": "http://100.93.225.17:9000"
+    "type": "HttpData",
+    "baseUrl": "http://100.93.225.17:7070/upload"
   }
 }
