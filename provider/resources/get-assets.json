@@ -1,0 +1,5 @@
+{
+  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "offset": 0,
+  "limit": 100
+}

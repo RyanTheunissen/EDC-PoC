@@ -1,13 +1,13 @@
 {
   "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
-  "@id": "12",
-  "accessPolicyId": "12",
-  "contractPolicyId": "12",
+  "@id": "14",
+  "accessPolicyId": "14",
+  "contractPolicyId": "14",
   "assetsSelector": [
     {
       "operandLeft": "https://w3id.org/edc/v0.0.1/ns/id",
       "operator": "=",
-      "operandRight": "12"
+      "operandRight": "14"
     }
   ]
 }

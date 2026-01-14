@@ -1,9 +1,12 @@
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
-  "@id": "12",
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@id": "14",
   "properties": {
     "name": "Test csv",
-    "description": "local test csv"
+    "description": "local test csv",
+    "type": "csv"
   },
   "dataAddress": {
     "@type": "DataAddress",
