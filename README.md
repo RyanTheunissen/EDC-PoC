@@ -111,7 +111,7 @@ curl -X POST "http://localhost:29193/management/v3/catalog/request" -H "X-Api-Ke
 curl -d @consumer/resources/negotiate-contract.json -H "X-Api-Key: password" -H "Content-Type: application/json" -X POST http://localhost:29193/management/v3/contractnegotiations -s | jq
 
 ### Get Contract ID
-curl -X GET "http://localhost:29193/management/v3/contractnegotiations/63f79bdb-1779-4f2b-aaee-9a1edd5892ca" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+curl -X GET "http://localhost:29193/management/v3/contractnegotiations/c8e25dbb-d3cd-484c-90e6-7308ffed3691" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
 
 ### Start Transfer
 curl -X POST "http://localhost:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer.json -s | jq

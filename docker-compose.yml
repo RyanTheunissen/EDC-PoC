@@ -1,9 +1,7 @@
 services:
 
   consumer:
-    build:
-        context: .
-        dockerfile: consumer/Dockerfile
+    image: ryantheunissen/edc-poc-consumer:latest
     container_name: consumer
     ports:
       - "29191:29191" # /api
