@@ -1,0 +1,14 @@
+{
+  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@id": "12",
+  "properties": {
+    "name": "Test csv (updated)",
+    "description": "local test csv - updated"
+  },
+  "dataAddress": {
+    "@type": "DataAddress",
+    "type": "HttpData",
+    "baseUrl": "http://pi-file-server/test.csv",
+    "proxyPath": "false"
+  }
+}

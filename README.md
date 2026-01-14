@@ -111,13 +111,13 @@ curl -X POST "http://localhost:29193/management/v3/catalog/request" -H "X-Api-Ke
 curl -d @consumer/resources/negotiate-contract.json -H "X-Api-Key: password" -H "Content-Type: application/json" -X POST http://localhost:29193/management/v3/contractnegotiations -s | jq
 
 ### Get Contract ID
-curl -X GET "http://localhost:29193/management/v3/contractnegotiations/63f79bdb-1779-4f2b-aaee-9a1edd5892ca" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+curl -X GET "http://localhost:29193/management/v3/contractnegotiations/4b92cd9d-e1ba-4ea2-b28a-1907d288404e" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
 
 ### Start Transfer
 curl -X POST "http://localhost:29193/management/v3/transferprocesses" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @consumer/resources/start-transfer.json -s | jq
 
 ### Transfer Status
-curl -X GET "http://localhost:29193/management/v3/transferprocesses/e0009a57-a42e-478d-b9c4-6ab42bc51754" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
+curl -X GET "http://localhost:29193/management/v3/transferprocesses/0e57b06e-b710-47c0-ad83-a4ff3b780eed" -H "X-Api-Key: password" -H "Content-Type: application/json" -s | jq
 
 
 ---
@@ -143,3 +143,23 @@ curl -X POST "http://100.101.111.95:19193/management/v3/policydefinitions" -H "X
 ### Create contract definition
 
 curl -X POST "http://100.101.111.95:19193/management/v3/contractdefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/contract-definition.json -s | jq
+
+### Remove asset from catalog
+
+curl -X DELETE "http://100.101.111.95:19193/management/v3/assets/1" -H "X-Api-Key: password" | jq
+
+### Get contract definition for a specific contract definition id
+
+curl -X GET "http://100.101.111.95:19193/management/v3/contractdefinitions/12" -H "X-Api-Key: password" | jq
+
+### Get assets from provider
+
+curl -i -X POST "http://100.101.111.95:19193/management/v3/assets/request" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/get-assets.json | jq
+
+### Update specific assets (description etc)
+
+curl -i -X PUT "http://100.101.111.95:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/update-asset.json
+
+### Get specific asset
+
+curl -X GET "http://100.101.111.95:19193/management/v3/assets/12" -H "X-Api-Key: password" | jq
