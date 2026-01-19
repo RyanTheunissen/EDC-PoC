@@ -1,32 +1,53 @@
 #!/usr/bin/env sh
-set -e
+set -eu
 
-conn_str="DefaultEndpointsProtocol=http;AccountName=provider;AccountKey=password;BlobEndpoint=http://azurite:10000/provider;"
+ACCOUNT_NAME="provider"
+ACCOUNT_KEY="password"
+BLOB_ENDPOINT="http://azurite:10000/provider"
 
-echo "Waiting for Azurite..."
-until az storage container list --connection-string "$conn_str" --auth-mode key >/dev/null 2>&1; do
+CONTAINER="src-container"
+BLOB_NAME="test-document.txt"
+FILE_PATH="/resources/test-document.txt"
+
+echo "Waiting for Azurite TCP port..."
+# Pure TCP readiness (no Azurite API calls that can 400)
+for i in $(seq 1 120); do
+  if (echo > /dev/tcp/azurite/10000) >/dev/null 2>&1; then
+    echo "Azurite port is open."
+    break
+  fi
   sleep 1
+  if [ "$i" -eq 120 ]; then
+    echo "ERROR: Azurite port 10000 not open after 120s"
+    exit 1
+  fi
 done
 
-echo "Creating container src-container..."
+echo "Creating container ${CONTAINER} (ignore if exists)..."
 az storage container create \
-  --name src-container \
-  --connection-string "$conn_str" \
-  --auth-mode key
+  --name "${CONTAINER}" \
+  --account-name "${ACCOUNT_NAME}" \
+  --account-key "${ACCOUNT_KEY}" \
+  --blob-endpoint "${BLOB_ENDPOINT}" \
+  --auth-mode key >/dev/null
 
-echo "Uploading blob test-document.txt..."
+echo "Uploading blob ${BLOB_NAME}..."
 az storage blob upload \
-  -f /resources/test-document.txt \
-  --container-name src-container \
-  --name test-document.txt \
-  --connection-string "$conn_str" \
+  --file "${FILE_PATH}" \
+  --container-name "${CONTAINER}" \
+  --name "${BLOB_NAME}" \
+  --account-name "${ACCOUNT_NAME}" \
+  --account-key "${ACCOUNT_KEY}" \
+  --blob-endpoint "${BLOB_ENDPOINT}" \
   --auth-mode key \
-  --overwrite true
+  --overwrite true >/dev/null
 
-echo "Listing blobs in src-container..."
+echo "Listing blobs in ${CONTAINER}..."
 az storage blob list \
-  --container-name src-container \
-  --connection-string "$conn_str" \
+  --container-name "${CONTAINER}" \
+  --account-name "${ACCOUNT_NAME}" \
+  --account-key "${ACCOUNT_KEY}" \
+  --blob-endpoint "${BLOB_ENDPOINT}" \
   --auth-mode key \
   --query "[].{name:name}" \
   --output table

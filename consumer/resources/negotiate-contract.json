@@ -3,10 +3,10 @@
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
   "@type": "ContractRequest",
-  "counterPartyAddress": "http:/100.101.111.95:19194/protocol",
+  "counterPartyAddress": "http:/provider:19194/protocol",
   "protocol": "dataspace-protocol-http",
   "policy": {
-    "@id": "MTI=:MTI=:YWZjZTU3NDMtMDc3Mi00NjNiLWIyMWYtNzU5OWYzN2MxZTdl",
+    "@id": "MQ==:MQ==:Y2YzOTk2NWMtYmNmMS00Y2M4LTkyZjgtMTgzMmE2OTg3ZGZj",
     "@type": "odrl:Offer",
     "odrl:permission": [],
     "odrl:prohibition": [],

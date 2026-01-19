@@ -32,8 +32,14 @@ services:
 
   azurite:
     container_name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite
-    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    command: >
+      azurite
+      --blobHost 0.0.0.0
+      --queueHost 0.0.0.0
+      --tableHost 0.0.0.0
+      --skipApiVersionCheck
+      --loose
     ports:
       - "10000:10000"
       - "10001:10001"
@@ -99,13 +105,14 @@ services:
       /usr/bin/mc mb dockerminio/src-bucket;
       exit 0;
       "
+
   azurite-init:
-    image: mcr.microsoft.com/azure-cli
+    image: mcr.microsoft.com/azure-cli:latest
     container_name: azurite-init
     depends_on:
       - azurite
     volumes:
       - ./scripts/init-azurite.sh:/init-azurite.sh:ro
       - ./provider/resources:/resources:ro
-    entrypoint: [ "/bin/sh", "/init-azurite.sh" ]
+    entrypoint: ["/bin/sh", "/init-azurite.sh"]
     restart: "no"
