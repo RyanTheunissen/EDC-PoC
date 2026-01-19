@@ -54,6 +54,6 @@ services:
     image: nginx:alpine
     container_name: pi-file-server
     volumes:
-      - /home/dataspace1/shared:/usr/share/nginx/html:ro
+      - /home/Dataspace/shared:/usr/share/nginx/html:ro
     ports:
       - "127.0.0.1:8080:80"
