@@ -52,7 +52,7 @@ services:
 
   file-server:
     image: nginx:alpine
-    container_name: pi-file-server
+    container_name: file-server
     volumes:
       - /home/Dataspace/shared:/usr/share/nginx/html:ro
     ports:
