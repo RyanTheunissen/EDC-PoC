@@ -13,6 +13,11 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: consumer
       AWS_SECRET_ACCESS_KEY: password
+
+      JAVA_TOOL_OPTIONS: "-Dlogback.configurationFile=/app/logback.xml"
+    volumes:
+      - ./logs/provider:/var/log/edc
+      - ./provider/resources/logback.xml:/app/logback.xml:ro
     depends_on:
       - vault
 
