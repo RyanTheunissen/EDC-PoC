@@ -1,8 +1,17 @@
+# Build the provider jar with Gradle
+FROM gradle:8.10-jdk17-corretto AS build
+
+WORKDIR /workspace
+
+COPY . .
+
+RUN gradle :provider:build -x test --no-daemon
+
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY provider/docker/provider-all.jar app.jar
+COPY --from=build /workspace/provider/build/libs/provider-all.jar app.jar
 
 COPY provider/config.properties config.properties
 
