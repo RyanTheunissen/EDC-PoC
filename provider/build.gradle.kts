@@ -49,6 +49,7 @@ dependencies {
     //logging
     runtimeOnly("ch.qos.logback:logback-classic:1.5.6")
     runtimeOnly("org.slf4j:slf4j-api:2.0.16")
+    runtimeOnly("org.codehaus.janino:janino:3.1.12")
 }
 
 tasks.shadowJar {
