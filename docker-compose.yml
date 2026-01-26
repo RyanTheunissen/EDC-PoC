@@ -1,25 +1,4 @@
 services:
-  provider:
-    build:
-      context: .
-      dockerfile: provider/Dockerfile
-    container_name: provider
-    ports:
-      - "19191:19191" # /api
-      - "19192:19192" # /control
-      - "19193:19193" # /management
-      - "19194:19194" # /protocol (DSP)
-      - "19291:19291" # /public
-    depends_on:
-      - vault
-      - azurite
-      - azurite-init
-    environment:
-      # Tell the JVM to use our JUL config
-      - JAVA_TOOL_OPTIONS=-Djava.util.logging.config.file=/app/config/logging.properties
-    volumes:
-      # Mount the logging config into the container
-      - ./config/logging.properties:/app/config/logging.properties:ro
 
   consumer:
     build:
@@ -36,17 +15,6 @@ services:
       - vault
       - minio
       - receiver
-
-  azurite:
-    container_name: azurite
-    image: mcr.microsoft.com/azure-storage/azurite
-    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
-    environment:
-      AZURITE_ACCOUNTS: provider:password
 
   minio:
     container_name: minio
@@ -106,16 +74,6 @@ services:
       /usr/bin/mc mb dockerminio/src-bucket;
       exit 0;
       "
-  azurite-init:
-    image: mcr.microsoft.com/azure-cli
-    container_name: azurite-init
-    depends_on:
-      - azurite
-    volumes:
-      - ./scripts/init-azurite.sh:/init-azurite.sh:ro
-      - ./provider/resources:/resources:ro
-    entrypoint: [ "/bin/sh", "/init-azurite.sh" ]
-    restart: "no"
 
   receiver:
     build:

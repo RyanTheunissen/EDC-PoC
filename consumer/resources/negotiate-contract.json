@@ -3,7 +3,7 @@
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
   },
   "@type": "ContractRequest",
-  "counterPartyAddress": "http:/100.101.111.95:19194/protocol",
+  "counterPartyAddress": "http:/20.19.80.74:19194/protocol",
   "protocol": "dataspace-protocol-http",
   "policy": {
     "@id": "MTI=:MTI=:ZWZhMDQ3ZWItYmRhYS00NzhiLThlMGQtN2IwMWE3Yjg5NzEy",
