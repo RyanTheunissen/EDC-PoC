@@ -45,6 +45,10 @@ dependencies {
     implementation("org.eclipse.edc.aws:data-plane-aws-s3:$edc")
     implementation("org.eclipse.edc.azure:data-plane-azure-storage:$edc")
     implementation("org.eclipse.edc:vault-hashicorp:$edc")
+
+    //logging
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.6")
+    runtimeOnly("org.slf4j:slf4j-api:2.0.16")
 }
 
 tasks.shadowJar {
