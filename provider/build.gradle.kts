@@ -8,7 +8,7 @@ application {
 }
 
 java {
-    toolchain { languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(17)) }
+    toolchain { languageVersion.set(JavaLanguageVersion.of(17)) }
 }
 
 dependencies {
@@ -35,7 +35,7 @@ dependencies {
     // Data plane + signaling + selector (provider needs DP to do PUSH)
     implementation("org.eclipse.edc:data-plane-core:$edc")
     implementation("org.eclipse.edc:data-plane-http:$edc")
-    implementation("org.eclipse.edc:data-plane-public-api-v2:$edc")    // deprecation warning is fine
+    implementation("org.eclipse.edc:data-plane-public-api-v2:$edc")
     implementation("org.eclipse.edc:data-plane-signaling-api:$edc")
     implementation("org.eclipse.edc:data-plane-self-registration:$edc")
     implementation("org.eclipse.edc:data-plane-selector-api:$edc")
