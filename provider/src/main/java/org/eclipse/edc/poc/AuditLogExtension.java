@@ -21,12 +21,16 @@ import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.domain.DataAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Extension(value = "Audit Logging Extension")
 public class AuditLogExtension implements ServiceExtension {
+
+    private static final Logger AUDIT = LoggerFactory.getLogger("AUDIT");
 
     @Inject
     private Monitor monitor;
@@ -48,11 +52,12 @@ public class AuditLogExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         var participantId = context.getSetting("edc.participant.id", "unknown");
-        monitor.info("AUDIT: AuditLogExtension initialized for participantId=" + participantId);
+
+        AUDIT.info("AUDIT: AuditLogExtension initialized for participantId={}", participantId);
 
         eventRouter.register(
                 Event.class,
-                new AuditEventSubscriber(monitor, participantId, transferProcessStore, contractNegotiationStore)
+                new AuditEventSubscriber(participantId, transferProcessStore, contractNegotiationStore)
         );
     }
 
@@ -70,18 +75,15 @@ public class AuditLogExtension implements ServiceExtension {
 
     static class AuditEventSubscriber implements EventSubscriber {
 
-        private final Monitor monitor;
         private final String participantId;
         private final TransferProcessStore transferProcessStore;
         private final ContractNegotiationStore contractNegotiationStore;
 
         private final Map<String, ContractInfo> contractsById = new ConcurrentHashMap<>();
 
-        AuditEventSubscriber(Monitor monitor,
-                             String participantId,
+        AuditEventSubscriber(String participantId,
                              TransferProcessStore transferProcessStore,
                              ContractNegotiationStore contractNegotiationStore) {
-            this.monitor = monitor;
             this.participantId = participantId;
             this.transferProcessStore = transferProcessStore;
             this.contractNegotiationStore = contractNegotiationStore;
@@ -90,32 +92,23 @@ public class AuditLogExtension implements ServiceExtension {
         private String mapNegotiationState(int code) {
             return switch (code) {
                 case 50 -> "INITIAL";
-
                 case 100 -> "REQUESTING";
                 case 200 -> "REQUESTED";
-
                 case 300 -> "OFFERING";
                 case 400 -> "OFFERED";
-
                 case 700 -> "ACCEPTING";
                 case 800 -> "ACCEPTED";
-
                 case 825 -> "AGREEING";
                 case 850 -> "AGREED";
-
                 case 1050 -> "VERIFYING";
                 case 1100 -> "VERIFIED";
-
                 case 1150 -> "FINALIZING";
                 case 1200 -> "FINALIZED";
-
                 case 1300 -> "TERMINATING";
                 case 1400 -> "TERMINATED";
-
                 default -> "UNKNOWN(" + code + ")";
             };
         }
-
 
         private String mapTransferState(int code) {
             return switch (code) {
@@ -163,7 +156,6 @@ public class AuditLogExtension implements ServiceExtension {
             }
 
             if (payload instanceof TransferProcessTerminated terminatedTransfer) {
-                // This is the interesting one for "where it fails"
                 logTransfer("TERMINATED", terminatedTransfer.getTransferProcessId(), eventEnvelope);
                 return;
             }
@@ -174,12 +166,8 @@ public class AuditLogExtension implements ServiceExtension {
             }
 
             var type = (payload != null) ? payload.getClass().getSimpleName() : "null";
-            var id = eventEnvelope.getId();
-            var at = eventEnvelope.getAt();
-            monitor.info(String.format(
-                    "AUDIT: participant=%s eventType=%s eventId=%s at=%d",
-                    participantId, type, id, at
-            ));
+            AUDIT.info("AUDIT: participant={} eventType={} eventId={} at={}",
+                    participantId, type, eventEnvelope.getId(), eventEnvelope.getAt());
         }
 
         private void handleContractFinalized(ContractNegotiationFinalized finalized, EventEnvelope envelope) {
@@ -192,23 +180,13 @@ public class AuditLogExtension implements ServiceExtension {
 
             contractsById.put(contractId, new ContractInfo(consumerId, providerId, assetId));
 
-            monitor.info(String.format(
-                    "AUDIT-CONTRACT: participant=%s eventType=ContractNegotiationFinalized eventId=%s at=%d " +
-                            "contractId=%s consumerId=%s providerId=%s assetId=%s",
-                    participantId,
-                    envelope.getId(),
-                    envelope.getAt(),
-                    contractId,
-                    consumerId,
-                    providerId,
-                    assetId
-            ));
+            AUDIT.info("AUDIT-CONTRACT: participant={} eventType=ContractNegotiationFinalized eventId={} at={} contractId={} consumerId={} providerId={} assetId={}",
+                    participantId, envelope.getId(), envelope.getAt(), contractId, consumerId, providerId, assetId);
         }
 
         private void handleContractTerminated(ContractNegotiationTerminated terminated, EventEnvelope envelope) {
             var negotiationId = terminated.getContractNegotiationId();
 
-            // Look up the negotiation in the store to find out who the counter-party was
             var negotiation = contractNegotiationStore.findById(negotiationId);
 
             String counterPartyId = "unknown";
@@ -233,19 +211,13 @@ public class AuditLogExtension implements ServiceExtension {
             } catch (Exception ignored) {
             }
 
-            monitor.info(String.format(
-                    "AUDIT-CONTRACT-FAILED: participant=%s eventType=ContractNegotiationTerminated eventId=%s at=%d " +
-                            "negotiationId=%s side=%s state=%s counterPartyId=%s counterPartyAddress=%s%s",
-                    participantId,
-                    envelope.getId(),
-                    envelope.getAt(),
-                    negotiationId,
-                    negotiationSide,
-                    state,
-                    counterPartyId,
-                    counterPartyAddress,
-                    reason != null ? " reason=\"" + reason + "\"" : ""
-            ));
+            if (reason != null) {
+                AUDIT.info("AUDIT-CONTRACT-FAILED: participant={} eventType=ContractNegotiationTerminated eventId={} at={} negotiationId={} side={} state={} counterPartyId={} counterPartyAddress={} reason=\"{}\"",
+                        participantId, envelope.getId(), envelope.getAt(), negotiationId, negotiationSide, state, counterPartyId, counterPartyAddress, reason);
+            } else {
+                AUDIT.info("AUDIT-CONTRACT-FAILED: participant={} eventType=ContractNegotiationTerminated eventId={} at={} negotiationId={} side={} state={} counterPartyId={} counterPartyAddress={}",
+                        participantId, envelope.getId(), envelope.getAt(), negotiationId, negotiationSide, state, counterPartyId, counterPartyAddress);
+            }
         }
 
         private void logTransfer(String phase, String transferProcessId, EventEnvelope<?> envelope) {
@@ -254,10 +226,8 @@ public class AuditLogExtension implements ServiceExtension {
             var at = envelope.getAt();
 
             if (tp == null) {
-                monitor.info(String.format(
-                        "AUDIT-TRANSFER: participant=%s phase=%s eventId=%s at=%d transferId=%s (transfer process not found in store)",
-                        participantId, phase, eventId, at, transferProcessId
-                ));
+                AUDIT.info("AUDIT-TRANSFER: participant={} phase={} eventId={} at={} transferId={} (transfer process not found in store)",
+                        participantId, phase, eventId, at, transferProcessId);
                 return;
             }
 
@@ -266,16 +236,14 @@ public class AuditLogExtension implements ServiceExtension {
 
             String consumerId = ci != null ? ci.consumerId : null;
             String providerId = ci != null ? ci.providerId : null;
-            String assetId    = ci != null ? ci.assetId    : null;
+            String assetId = ci != null ? ci.assetId : null;
 
             DataAddress dest = tp.getDataDestination();
 
             String destType = dest != null ? dest.getType() : null;
-            String bucket   = dest != null ? dest.getStringProperty("bucketName") : null;
-            String object   = dest != null
-                    ? (dest.getStringProperty("objectName") != null
-                    ? dest.getStringProperty("objectName")
-                    : dest.getKeyName())
+            String bucket = dest != null ? dest.getStringProperty("bucketName") : null;
+            String object = dest != null
+                    ? (dest.getStringProperty("objectName") != null ? dest.getStringProperty("objectName") : dest.getKeyName())
                     : null;
             String endpoint = dest != null ? dest.getStringProperty("endpointOverride") : null;
 
@@ -298,30 +266,15 @@ public class AuditLogExtension implements ServiceExtension {
                 }
             }
 
-            monitor.info(String.format(
-                    "AUDIT-TRANSFER: participant=%s side=%s phase=%s eventId=%s at=%d " +
-                            "transferId=%s state=%s(%d) counterPartyId=%s contractId=%s " +
-                            "consumerId=%s providerId=%s assetId=%s " +
-                            "destType=%s bucket=%s object=%s endpoint=%s%s",
-                    participantId,
-                    side,
-                    phase,
-                    eventId,
-                    at,
-                    transferProcessId,
-                    state,
-                    stateCode,
-                    counterPartyId,
-                    contractId,
-                    consumerId,
-                    providerId,
-                    assetId,
-                    destType,
-                    bucket,
-                    object,
-                    endpoint,
-                    errorDetail != null ? " error=\"" + errorDetail + "\"" : ""
-            ));
+            if (errorDetail != null) {
+                AUDIT.info("AUDIT-TRANSFER: participant={} side={} phase={} eventId={} at={} transferId={} state={}({}) counterPartyId={} contractId={} consumerId={} providerId={} assetId={} destType={} bucket={} object={} endpoint={} error=\"{}\"",
+                        participantId, side, phase, eventId, at, transferProcessId, state, stateCode, counterPartyId, contractId,
+                        consumerId, providerId, assetId, destType, bucket, object, endpoint, errorDetail);
+            } else {
+                AUDIT.info("AUDIT-TRANSFER: participant={} side={} phase={} eventId={} at={} transferId={} state={}({}) counterPartyId={} contractId={} consumerId={} providerId={} assetId={} destType={} bucket={} object={} endpoint={}",
+                        participantId, side, phase, eventId, at, transferProcessId, state, stateCode, counterPartyId, contractId,
+                        consumerId, providerId, assetId, destType, bucket, object, endpoint);
+            }
         }
     }
 }
