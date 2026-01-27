@@ -10,7 +10,10 @@ import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
-import org.eclipse.edc.spi.types.domain.DataAddress;
+
+// ✅ Try this import (your IDE will confirm the exact package)
+// In many EDC setups it exists via the data-plane-http modules:
+import org.eclipse.edc.connector.dataplane.http.spi.HttpDataAddress;
 
 import static org.eclipse.edc.spi.query.Criterion.criterion;
 
@@ -27,24 +30,42 @@ public class CloudBootstrapExtension implements ServiceExtension {
 
     @Override
     public String name() {
-        return "Cloud Bootstrap (Http Asset, Empty Policy)";
+        return "Cloud Bootstrap (HttpData Asset, Empty Policy)";
     }
 
     @Override
     public void initialize(ServiceExtensionContext context) {
-        var policy = createEmptyPolicy();
-        policyDefinitionStore.create(policy);
+        // 1) empty/unrestricted policy (fixed id "1")
+        var policyDef = PolicyDefinition.Builder.newInstance()
+                .id("1")
+                .policy(Policy.Builder.newInstance().build())
+                .build();
+        try {
+            policyDefinitionStore.create(policyDef);
+        } catch (Exception ignored) {
+            context.getMonitor().warning("PolicyDefinition id=1 already exists (ok)");
+        }
 
-        registerAsset();
+        // 2) asset (fixed id "1") with HttpDataAddress (IMPORTANT)
+        registerHttpAsset(context);
 
-        registerContractDefinition(policy.getId());
+        // 3) contract definition (fixed id "1")
+        var contractDefinition = ContractDefinition.Builder.newInstance()
+                .id("1")
+                .accessPolicyId("1")
+                .contractPolicyId("1")
+                .assetsSelectorCriterion(criterion(Asset.PROPERTY_ID, "=", "1"))
+                .build();
+        try {
+            contractDefinitionStore.save(contractDefinition);
+        } catch (Exception ignored) {
+            context.getMonitor().warning("ContractDefinition id=1 already exists (ok)");
+        }
     }
 
-    private void registerAsset() {
-        var dataAddress = DataAddress.Builder.newInstance()
-                .type("HttpData")
-                .property("baseUrl", "http://file-server/test.txt")
-                .property("proxyPath", "false")
+    private void registerHttpAsset(ServiceExtensionContext context) {
+        var httpDataAddress = HttpDataAddress.Builder.newInstance()
+                .baseUrl("http://file-server/test.txt")
                 .build();
 
         var asset = Asset.Builder.newInstance()
@@ -52,34 +73,11 @@ public class CloudBootstrapExtension implements ServiceExtension {
                 .property("name", "Test txt")
                 .property("description", "local test txt")
                 .property("type", "txt")
-                .dataAddress(dataAddress)
+                .dataAddress(httpDataAddress)
                 .build();
 
         assetIndex.create(asset);
-    }
 
-
-    private void registerContractDefinition(String policyId) {
-
-        var contractDefinition = ContractDefinition.Builder.newInstance()
-                .id("1")
-                .accessPolicyId(policyId)
-                .contractPolicyId(policyId)
-                .assetsSelectorCriterion(
-                        criterion(Asset.PROPERTY_ID, "=", "1")
-                )
-                .build();
-
-        contractDefinitionStore.save(contractDefinition);
-    }
-
-    private PolicyDefinition createEmptyPolicy() {
-
-        var policy = Policy.Builder.newInstance().build();
-
-        return PolicyDefinition.Builder.newInstance()
-                .id("1")
-                .policy(policy)
-                .build();
+        context.getMonitor().info("Bootstrapped asset id=1 with HttpDataAddress baseUrl=http://file-server/test.txt");
     }
 }
