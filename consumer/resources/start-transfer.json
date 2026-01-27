@@ -5,11 +5,11 @@
   "@type": "TransferRequestDto",
   "connectorId": "provider",
   "counterPartyAddress": "http://20.19.80.74:19194/protocol",
-  "contractId": "634e1635-9387-4e3c-b3a5-aa0d1fbbdd4f",
+  "contractId": "355d76a3-6563-4224-9649-f406dd21e93b",
   "protocol": "dataspace-protocol-http",
   "transferType": "HttpData-PUSH",
   "dataDestination": {
     "type": "HttpData",
-    "baseUrl": "http://<host-ip>:7070/upload"
+    "baseUrl": "https://edc-receiver.hsleiden.com/upload"
   }
 }
