@@ -41,10 +41,8 @@ public class CloudBootstrapExtension implements ServiceExtension {
     }
 
     private void registerAsset() {
-
         var dataAddress = DataAddress.Builder.newInstance()
                 .type("HttpData")
-                .property("@type", "DataAddress")
                 .property("baseUrl", "http://file-server/test.txt")
                 .property("proxyPath", "false")
                 .build();
@@ -59,6 +57,7 @@ public class CloudBootstrapExtension implements ServiceExtension {
 
         assetIndex.create(asset);
     }
+
 
     private void registerContractDefinition(String policyId) {
 
