@@ -134,15 +134,15 @@ docker compose -f consumer/resources/docker-compose-consumer.yaml down
 
 ### Create asset
 
-curl -X POST "http://100.101.111.95:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-asset.json -s | jq
+curl -X POST "http://20.19.80.74//:19193/management/v3/assets" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-asset.json -s | jq
 
 ### Create policy definition
 
-curl -X POST "http://100.101.111.95:19193/management/v3/policydefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-policy.json -s | jq
+curl -X POST "http://20.19.80.74:19193/management/v3/policydefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/create-policy.json -s | jq
 
 ### Create contract definition
 
-curl -X POST "http://100.101.111.95:19193/management/v3/contractdefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/contract-definition.json -s | jq
+curl -X POST "http://20.19.80.74:19193/management/v3/contractdefinitions" -H "X-Api-Key: password" -H "Content-Type: application/json" -d @provider/resources/contract-definition.json -s | jq
 
 ### Remove asset from catalog
 

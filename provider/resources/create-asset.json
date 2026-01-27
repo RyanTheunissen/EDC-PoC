@@ -4,14 +4,14 @@
   },
   "@id": "14",
   "properties": {
-    "name": "Test csv",
-    "description": "local test csv",
-    "type": "csv"
+    "name": "Test txt",
+    "description": "local test txt",
+    "type": "txt"
   },
   "dataAddress": {
     "@type": "DataAddress",
     "type": "HttpData",
-    "baseUrl": "http://pi-file-server/test.csv",
+    "baseUrl": "http://file-server/test.txt",
     "proxyPath": "false"
   }
 }
