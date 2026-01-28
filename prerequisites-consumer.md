@@ -1,10 +1,10 @@
 # Prerequisites – EDC Data Space PoC (Consumer – Local Workstation)
 
-This document lists all prerequisites needed to run the **EDC Consumer**
+This document lists all prerequisites needed to run the EDC Consumer
 locally on a laptop or workstation (Linux, macOS, or Windows).
 
 The consumer is assumed to:
-- run *utside the provider VM
+- run outside the provider VM
 - not have a public IP address
 - be reachable via Cloudflare Tunnel instead of port forwarding
 
