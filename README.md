@@ -121,7 +121,7 @@ curl -X POST "http://<provider-ip>:19193/management/v3/policydefinitions" \
 ### Create contract definition
 
 ```bash
-curl -X POST "http://100.101.111.95:19193/management/v3/contractdefinitions" \
+curl -X POST "http://<provider-ip>:19193/management/v3/contractdefinitions" \
   -H "X-Api-Key: password" \
   -H "Content-Type: application/json" \
   -d @provider/resources/contract-definition.json \
@@ -131,20 +131,20 @@ curl -X POST "http://100.101.111.95:19193/management/v3/contractdefinitions" \
 ### Remove asset from catalog
 
 ```bash
-curl -X DELETE "http://100.101.111.95:19193/management/v3/assets/1" \
+curl -X DELETE "http://<provider-ip>:19193/management/v3/assets/1" \
   -H "X-Api-Key: password" | jq
 ```
 ### Get contract definition for a specific contract definition id
 
 ```bash
-curl -X GET "http://100.101.111.95:19193/management/v3/contractdefinitions/12" \
+curl -X GET "http://<provider-ip>:19193/management/v3/contractdefinitions/12" \
   -H "X-Api-Key: password" | jq
 ```
 
 ### Get assets from provider
 
 ```bash
-curl -i -X POST "http://100.101.111.95:19193/management/v3/assets/request" \
+curl -i -X POST "http://<provider-ip>:19193/management/v3/assets/request" \
   -H "X-Api-Key: password" -H "Content-Type: application/json" \
   -d @provider/resources/get-assets.json | jq
 ```
@@ -152,7 +152,7 @@ curl -i -X POST "http://100.101.111.95:19193/management/v3/assets/request" \
 ### Update specific assets (description etc)
 
 ```bash
-curl -i -X PUT "http://100.101.111.95:19193/management/v3/assets" \
+curl -i -X PUT "http://<provider-ip>:19193/management/v3/assets" \
   -H "X-Api-Key: password" \
   -H "Content-Type: application/json" \
   -d @provider/resources/update-asset.json | jq
@@ -161,7 +161,7 @@ curl -i -X PUT "http://100.101.111.95:19193/management/v3/assets" \
 ### Get specific asset
 
 ```bash
-curl -X GET "http://100.101.111.95:19193/management/v3/assets/12" \
+curl -X GET "http://<provider-ip>:19193/management/v3/assets/12" \
 -H "X-Api-Key: password" | jq
 ```
 
