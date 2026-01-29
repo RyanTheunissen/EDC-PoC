@@ -17,6 +17,12 @@ git checkout dsazure
 
 ## Starting Sandbox
 
+Adjust callbackurl to public ip of your VM in your config.properties file.
+
+```properties
+edc.dsp.callback.address=http://<your-public-ip>:19194/protocol
+```
+
 To just setup everything in docker containers and seed the assets etc. use:
 
 
