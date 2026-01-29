@@ -2,6 +2,13 @@
 
 This project demonstrates a simple setup of **Provider** and **Consumer** connectors.
 
+## Recommended Reading Order
+
+1. [Prerequisites Provider](prerequisites-provider.md) **TODO**
+2. [Prerequisites Consumer](prerequisites-consumer.md)
+3. [Tunneling for Consumer](consumer_ports.md)
+4. [This README](README.md)
+
 ---
 
 ## Starting Sandbox
@@ -49,6 +56,22 @@ java -Dedc.fs.config=consumer/config.properties -jar consumer/build/libs/consume
 
 ### Fetch Catalog
 
+To fetch the catalog on the provider you need to use the provider IP address in the request body.
+
+replace `<provider-ip>` with the IP address of the provider in the [fetch-catalog](consumer/resources/fetch-catalog.json) file.
+
+```json
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "counterPartyAddress": "http://<provider-ip>:19194/protocol",
+  "protocol": "dataspace-protocol-http"
+}
+```
+
+After that send the request:
+
 ```bash
 curl -X POST "http://localhost:29193/management/v3/catalog/request" \
   -H "X-Api-Key: password" \
@@ -56,7 +79,35 @@ curl -X POST "http://localhost:29193/management/v3/catalog/request" \
   -d @consumer/resources/fetch-catalog.json | jq
 ```
 
+You will get a catalog response with the assets from the provider.
+
 ### Negotiate Contract
+
+The response will look something like this:
+
+```json
+{
+  "@id": "3c753a86-ec51-4edf-a6d8-698b16efc87c",
+  "@type": "dcat:Catalog",
+  "dcat:dataset": {
+    "@id": "1",
+    "@type": "dcat:Dataset",
+    "odrl:hasPolicy": {
+      "@id": "MQ==:MQ==:YTc4M2ZhN2ItOGZhYS00Yzk2LWJjMzEtNGI3YTlmMmE4ZGE3",
+      "@type": "odrl:Offer",
+      "odrl:permission": [],
+      "odrl:prohibition": [],
+      "odrl:obligation": []
+    }
+  }
+}
+```
+
+You will need the `@id` of the asset to start the contract negotiation. In this example it is `MQ==:MQ==:YTc4M2ZhN2ItOGZhYS00Yzk2LWJjMzEtNGI3YTlmMmE4ZGE3`
+
+Replace `<asset-id>` with the `@id` of the asset in the [negotiate-contract](consumer/resources/negotiate-contract.json) file.
+
+After that send the following POST request:
 
 ```bash
 curl -X POST "http://localhost:29193/management/v3/contractnegotiations" \
@@ -64,7 +115,14 @@ curl -X POST "http://localhost:29193/management/v3/contractnegotiations" \
   -H "Content-Type: application/json" \
   -d @consumer/resources/negotiate-contract.json | jq
 ```
-### Get Contract ID
+
+You will get a response containing the contract ID.
+
+### Get Contract Agreement ID
+
+With the received contract ID you can check on the status of the contract negotiation. 
+If this is successful, you will get a contract agreement ID in the response of this GET request:
+
 ```bash
 curl -X GET "http://localhost:29193/management/v3/contractnegotiations/<contract-id>" \
   -H "X-Api-Key: password" \
@@ -72,13 +130,46 @@ curl -X GET "http://localhost:29193/management/v3/contractnegotiations/<contract
   -s | jq
 ```
 ### Start Transfer
+
+When the contract negotiation is successful, you can start the transfer process.
+Replace `<contract-agreement-id>` with the contract agreement ID and the <provider-ip> with the provider IP in the [start-transfer](consumer/resources/start-transfer.json) file.
+
+example:
+
+```json
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "TransferRequestDto",
+  "connectorId": "provider",
+  "counterPartyAddress": "http://<provider-ip>:19194/protocol",
+  "contractId": "<contract-agreement-id>",
+  "protocol": "dataspace-protocol-http",
+  "transferType": "HttpData-PUSH",
+  "dataDestination": {
+    "type": "HttpData",
+    "baseUrl": "https://edc-receiver.hsleiden.com/upload"
+  }
+}
+```
+
+Also make sure the data destination is reachable from the consumer. In this example it is the tunneled port on the consumer.
+If you are port forwarding, this should be port 7070/upload on your local machine for the receiver container that sends the data to the minio container.
+
 ```bash
 curl -X POST "http://localhost:29193/management/v3/transferprocesses" \
   -H "X-Api-Key: password" \
   -H "Content-Type: application/json" \
   -d @consumer/resources/start-transfer.json | jq
 ```
+The response will contain the transfer ID.
+
 ### Transfer Status
+
+When checking the status of the transfer, you need the transfer ID from the previous step. 
+Replace `<transfer-id>` with the transfer ID in the following GET request:
+
 ```bash
 curl -X GET "http://localhost:29193/management/v3/transferprocesses/<transfer-id>" \
   -H "X-Api-Key: password" \
@@ -89,6 +180,8 @@ curl -X GET "http://localhost:29193/management/v3/transferprocesses/<transfer-id
 ---
 
 ## Clean Up
+
+To stop the sandbox and remove all containers and volumes:
 
 ```bash
 docker compose down -v --remove-orphans
@@ -164,10 +257,3 @@ curl -i -X PUT "http://<provider-ip>:19193/management/v3/assets" \
 curl -X GET "http://<provider-ip>:19193/management/v3/assets/12" \
 -H "X-Api-Key: password" | jq
 ```
-
-## Recommended Reading Order
-
-1. [Prerequisites Provider](prerequisites-provider.md) **TODO**
-2. [Prerequisites Consumer](prerequisites-consumer.md)
-3. [Tunneling for Consumer](consumer_ports.md)
-4. [This README](README.md)
