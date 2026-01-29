@@ -4,6 +4,17 @@ This project demonstrates a simple setup of **Provider** and **Consumer** connec
 
 ---
 
+## Cloning from git
+
+```bash
+git clone https://github.com/ryantheunissen/EDC-PoC.git
+```
+
+```bash
+cd EDC-PoC
+git checkout dsazure
+```
+
 ## Starting Sandbox
 
 To just setup everything in docker containers and seed the assets etc. use:
