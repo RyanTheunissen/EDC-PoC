@@ -24,8 +24,8 @@ services:
       - "9001:9001"
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: consumer
-      MINIO_ROOT_PASSWORD: password
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
 
   vault:
     container_name: vault
@@ -35,7 +35,7 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "<root-token>"
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
 
   vault-init:
@@ -45,7 +45,7 @@ services:
       - vault
     environment:
       VAULT_ADDR: "http://vault:8200"
-      VAULT_TOKEN: "<root-token>"
+      VAULT_TOKEN: ${VAULT_ROOT_TOKEN}
     entrypoint: [ "/bin/sh", "-c" ]
     command: >
       "
@@ -54,9 +54,9 @@ services:
         sleep 1;
       done;
       echo 'Seeding secrets into Vault...';
-      vault kv put secret/edc.aws.access.key         content=consumer &&
-      vault kv put secret/edc.aws.secret.access.key  content=password &&
-      vault kv put secret/provider-key               content=password;
+      vault kv put secret/edc.aws.access.key         content=${MINIO_ROOT_USER} &&
+      vault kv put secret/edc.aws.secret.access.key  content=${MINIO_ROOT_PASSWORD} &&
+      vault kv put secret/provider-key               content=${MINIO_ROOT_PASSWORD};
       echo 'Vault init done.';
       "
     restart: "no"
@@ -70,7 +70,7 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      /usr/bin/mc alias set dockerminio http://minio:9000 consumer password;
+      /usr/bin/mc alias set dockerminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb dockerminio/src-bucket;
       exit 0;
       "
@@ -87,8 +87,8 @@ services:
       - "7070:7070"
     environment:
       MINIO_ENDPOINT: "http://minio:9000"
-      MINIO_ACCESS_KEY: "consumer"
-      MINIO_SECRET_KEY: "password"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: "src-bucket"
-      MINIO_OBJECT: "test.csv"
+      MINIO_OBJECT: "test.txt"
     restart: on-failure
