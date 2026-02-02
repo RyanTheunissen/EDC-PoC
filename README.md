@@ -4,7 +4,7 @@ This project demonstrates a simple setup of **Provider** and **Consumer** connec
 
 ## Recommended Reading Order
 
-1. [Prerequisites Provider](prerequisites-provider.md) **TODO**
+1. [Prerequisites Provider](prerequisites-provider.md)
 2. [Prerequisites Consumer](prerequisites-consumer.md)
 3. [Tunneling for Consumer](consumer_ports.md)
 4. [This README](README.md)
