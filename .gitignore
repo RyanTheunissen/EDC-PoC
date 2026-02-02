@@ -52,3 +52,4 @@ provider/build/tmp/jar/MANIFEST.MF
 provider/build/tmp/shadowJar/MANIFEST.MF
 provider/resources/test.json
 .idea/.gitignore
+.env
