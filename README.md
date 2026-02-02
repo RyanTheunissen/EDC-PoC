@@ -135,7 +135,9 @@ curl -X GET "http://localhost:29193/management/v3/contractnegotiations/<contract
 When the contract negotiation is successful, you can start the transfer process.
 Replace `<contract-agreement-id>` with the contract agreement ID and the <provider-ip> with the provider IP in the [start-transfer](consumer/resources/start-transfer.json) file.
 
-example:
+Make sure to also set the header `X-Filename` to the filename and extension you want it to have in the data destination.
+
+Example:
 
 ```json
 {
@@ -150,7 +152,8 @@ example:
   "transferType": "HttpData-PUSH",
   "dataDestination": {
     "type": "HttpData",
-    "baseUrl": "https://edc-receiver.hsleiden.com/upload"
+    "baseUrl": "https://edc-receiver.hsleiden.com/upload",
+    "header:X-Filename": "test.txt"
   }
 }
 ```
