@@ -7,7 +7,8 @@ This project demonstrates a simple setup of **Provider** and **Consumer** connec
 1. [Prerequisites Provider](prerequisites-provider.md)
 2. [Prerequisites Consumer](prerequisites-consumer.md)
 3. [Tunneling for Consumer](consumer_ports.md)
-4. [This README](README.md)
+4. [Azure VM Setup](Azure-setup.md)
+5. [This README](README.md)
 
 ---
 

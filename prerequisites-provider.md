@@ -2,10 +2,7 @@
 
 This document lists all prerequisites needed to run the EDC Provider on a VM in for example Azure.
 
-The consumer is assumed to:
-- run outside the provider VM
-- not have a public IP address
-- be reachable via Cloudflare Tunnel instead of port forwarding
+Before starting, ensure you have completed all steps in the [Azure VM setup](Azure-setup.md) guide.
 
 ---
 
