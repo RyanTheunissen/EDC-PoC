@@ -4,10 +4,11 @@ This project demonstrates a simple setup of **Provider** and **Consumer** connec
 
 ## Recommended Reading Order
 
-1. [Prerequisites Provider](prerequisites-provider.md)
-2. [Prerequisites Consumer](prerequisites-consumer.md)
+1. [Starting Guide](guide.md) 
+2. [Azure VM Setup](Azure-setup.md)
+2. [Prerequisites Provider](prerequisites-provider.md)
 3. [Tunneling for Consumer](consumer_ports.md)
-4. [Azure VM Setup](Azure-setup.md)
+4. [Prerequisites Consumer](prerequisites-consumer.md)
 5. [This README](README.md)
 
 ---
@@ -193,7 +194,7 @@ docker compose down -v --remove-orphans
 
 ---
 
-## Provider API Calls
+## Management API Examples
 
 ### Create asset
 
