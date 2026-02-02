@@ -90,5 +90,4 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: "src-bucket"
-      MINIO_OBJECT: "test.txt"
     restart: on-failure

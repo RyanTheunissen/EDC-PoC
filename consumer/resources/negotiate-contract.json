@@ -6,13 +6,13 @@
   "counterPartyAddress": "http:/20.19.80.74:19194/protocol",
   "protocol": "dataspace-protocol-http",
   "policy": {
-    "@id": "MTI=:MTI=:ZWZhMDQ3ZWItYmRhYS00NzhiLThlMGQtN2IwMWE3Yjg5NzEy",
+    "@id": "MQ==:MQ==:YjQxN2FkZDEtNTEwOC00M2QwLWExZTMtYzFiYzBhZWU4MmMz",
     "@type": "odrl:Offer",
     "odrl:permission": [],
     "odrl:prohibition": [],
     "odrl:obligation": [],
     "@context": "http://www.w3.org/ns/odrl.jsonld",
     "assigner": "provider",
-    "target": "12"
+    "target": "1"
   }
 }
