@@ -19,7 +19,7 @@ Supported / tested:
 - Windows 11 (via Docker Desktop)
 
 Notes:
-- Linux is recommended. This has been tested with clouflared.
+- Linux is recommended. This has been tested with cloudflared.
 - Windows is supported via Docker Desktop. This has been tested with a Tailscale VPN.
 
 ---
