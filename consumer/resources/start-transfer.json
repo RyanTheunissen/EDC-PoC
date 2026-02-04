@@ -5,7 +5,7 @@
   "@type": "TransferRequestDto",
   "connectorId": "provider",
   "counterPartyAddress": "http://20.19.80.74:19194/protocol",
-  "contractId": "15d750ab-595f-4144-9334-a14391aa2b22",
+  "contractId": "<contract-agreement-id>",
   "protocol": "dataspace-protocol-http",
   "transferType": "HttpData-PUSH",
   "dataDestination": {

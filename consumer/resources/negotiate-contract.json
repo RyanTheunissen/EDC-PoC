@@ -6,7 +6,7 @@
   "counterPartyAddress": "http:/20.19.80.74:19194/protocol",
   "protocol": "dataspace-protocol-http",
   "policy": {
-    "@id": "MQ==:MQ==:YjQxN2FkZDEtNTEwOC00M2QwLWExZTMtYzFiYzBhZWU4MmMz",
+    "@id": "<asset-id>",
     "@type": "odrl:Offer",
     "odrl:permission": [],
     "odrl:prohibition": [],
